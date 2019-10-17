@@ -304,7 +304,7 @@ Bluetooth
 `sudo pacman -S bluez bluez-utils blueman`
 
 Misc and tools  
-`sudo pacman -S git neovim atom neofetch pacman-contrib imagemagick maim mupdf acpi redshift arandr lightdm-webkit2-greeter dconf-editor`
+`sudo pacman -S git neovim atom neofetch pacman-contrib imagemagick maim mupdf acpi redshift arandr lightdm-webkit2-greeter dconf-editor acpid acpi_call`
 
 Settings  
 `sudo pacman -S lxappearance`
