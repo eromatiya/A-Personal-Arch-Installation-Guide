@@ -9,35 +9,50 @@ I'm using GPT and systemd-boot in my installation.
 
 # Set the keyboard layout
 The default console keymap is US. Available layouts can be listed with:
-`# ls /usr/share/kbd/keymaps/**/*.map.gz`
+```
+# ls /usr/share/kbd/keymaps/**/*.map.gz
+```
 
 To modify the layout, append a corresponding file name to loadkeys, omitting path and file extension. For example, to set a German keyboard layout:  
-`# loadkeys us`
+```
+# loadkeys us
+```
 
 
 # Update the system clock
 Use timedatectl to ensure the system clock is accurate:  
-`# timedatectl set-ntp true`
-
-
+```
+# timedatectl set-ntp true
+```
 
 # Disk Partitioning
 + **Verify the boot mode**
 If UEFI mode is enabled on an UEFI motherboard, Archiso will boot Arch Linux accordingly via systemd-boot. To verify this, list the efivars directory:  
-`# ls /sys/firmware/efi/efivars`
+
+```
+# ls /sys/firmware/efi/efivars
+```
 
 + **Check the drives**
 The most common main drive is **sda** *I think*  
-`# lsblk`
+
+```
+# lsblk
+```
 
 + **Let’s clean up our main drive to create new partitions for our installation**  
-`# gdisk /dev/sda`  
+```
+# gdisk /dev/sda
+```  
   - Press *x* to enter **expert mode**. Then press *z* to **zap** our drive. Just hit *y* when prompted about wiping out GPT and blanking out MBR.  
   
 Remember *x* button is to enter export mode and *z* is to zap or wipe-out the drive. **Think carefully before pressing Y you can't undo this!**
 
 + **Now let’s create our partitions**  
-`# cgdisk`
+
+```
+# cgdisk
+```
   - Enter the device filename of your main drive, e.g. /dev/sda. Just press enter when warned about damaged GPT.
 
 Now we should be presented with our main drive showing the partition number, partition size, partition type, and partition name. If you see list of partitions, delete all those first.
@@ -82,7 +97,10 @@ Lastly, hit *Write* at the bottom of the patitions list to write the changes to 
 # FORMATTING PARTITIONS
 
 + **Let’s see the new partition list**
-`# lsblk`
+
+```
+# lsblk
+```
 
 **You should see something LIKE:**
 
@@ -101,30 +119,47 @@ Lastly, hit *Write* at the bottom of the patitions list to write the changes to 
   +  sda4 is the root partition
 
 + **Format the boot partition as FAT32**  
-`# mkfs.fat -F32 /dev/sda1`  
+
+```
+# mkfs.fat -F32 /dev/sda1
+```  
 
 + **Enable the swap partition**  
-`# mkswap /dev/sda2`  
-`# swapon /dev/sda2`  
+
+```
+# mkswap /dev/sda2  
+# swapon /dev/sda2
+```  
 
 + **Format home and root partition as ext4**  
-`# mkfs.ext4 /dev/sda3`  
-`# mkfs.ext4 /dev/sda4`  
+
+```
+# mkfs.ext4 /dev/sda3  
+# mkfs.ext4 /dev/sda4
+```  
 
 
 # Connect to internet  
-We need to make sure we are connected to the internet to be able to install Arch Linux base packages. Let’s see the names of our interfaces.  
-`# ip link`
+We need to make that sure we are connected to the internet to be able to install Arch Linux base and linux packages. Let’s see the names of our interfaces.  
+```
+# ip link
+```
 
 If you are on a wired connection, you can enable your wired interface by systemctl start dhcpcd@<interface>.  
-`# systemctl start dhcpcd@enp3s0`
+```
+# systemctl start dhcpcd@enp3s0
+```
 
 If you are on a laptop, you can connect to a wireless access point using wifi-menu -o <wireless_interface>.  
-`# systemctl enable netctl`  
-`# wifi-menu wlp7s0`  
+```
+# systemctl enable netctl  
+# wifi-menu wlp7s0
+```  
 
 Ping google to make sure we are online**  
-`# ping -c 3 google.com`  
+```
+# ping -c 3 google.com
+``` 
 
 If you receive Unknown host or Destination host unreachable response, means you are not online yet. Review your network configuration and redo the steps above.
 
@@ -133,25 +168,38 @@ After setting up the drive and connecting to the internet, we are now ready to i
 First we need to mount the partitions that we created earlier to their appropriate mount points.
 
 + Mount the root partition:  
-`# mount /dev/sda3 /mnt`  
+
+```
+# mount /dev/sda3 /mnt
+```  
 
 *If /mnt doesn't exists create it*  
-`mkdir /mnt`  
+```
+mkdir /mnt
+```  
 
 + Mount the boot partition  
-`# mkdir /mnt/boot`  
-`# mount /dev/sda1 /mnt/boot`  
+
+```
+# mkdir /mnt/boot  
+# mount /dev/sda1 /mnt/boot
+```  
 
 + Mount the home partion  
-`# mkdir /mnt/home`  
-`#  mount /dev/sda4 /mnt/home`  
+
+```
+# mkdir /mnt/home
+#  mount /dev/sda4 /mnt/home
+``` 
 
 We don’t need to mount **swap** since it is already enabled.  
 
 Now let’s go ahead and install base, linux and base-devel packages into our system. The kernel is now not included in the base group including other application like editors. Even the lovely *nano* doesn't survived the snap.  
 
 So let's also install the packages detached from the base group.  
-`# pacstrap /mnt base linux linux-firmware base-devel less logrotate man-db man-pages which dhcpcd inetutils jfsutils mdadm perl reiserfsprogs sysfsutils systemd-sysvcompat texinfo usbutils xfsprogs s-nail netctl nano iputils`  
+```
+# pacstrap /mnt base linux linux-firmware base-devel less logrotate man-db man-pages which dhcpcd inetutils jfsutils mdadm perl reiserfsprogs sysfsutils systemd-sysvcompat texinfo usbutils xfsprogs s-nail netctl nano iputils
+```
 
 It's your decision if you want to install the packages.  
 
@@ -159,172 +207,329 @@ Just hit enter/yes for all the prompts that come up. Wait for Arch to finish ins
 
 
 + **Now let’s generate our fstab file**  
-`# genfstab -U /mnt >> /mnt/etc/fstab`  
+
+```
+# genfstab -U /mnt >> /mnt/etc/fstab
+```  
 
 
 # Configuration
 
 Now, chroot to the newly installed system  
-`# arch-chroot /mnt /bin/bash`
+
+```
+# arch-chroot /mnt /bin/bash
+```
+
 
 The Locale defines which language the system uses, and other regional considerations such as currency denomination, numerology, and character sets. Possible values are listed in */etc/locale.gen*. Uncomment *en_US.UTF-8*, as well as other needed localisations.
 
 Save the file, and generate the new locales  
 
-`# locale-gen`  
-`# echo 'LANG=en_US.UTF-8' > /etc/locale.conf`  
+```
+# locale-gen
+# echo 'LANG=en_US.UTF-8' > /etc/locale.conf
+```  
 
 
 # Configure time:
 
 A selection of timezones can be found under */usr/share/zoneinfo/*. Since I am in the Philippines, I will be using */usr/share/zoneinfo/Asia/Manila*. Select the appropriate timezone for your country:  
 
-`# ln -s /usr/share/zoneinfo/Asia/Manila /etc/localtime`
+```
+# ln -s /usr/share/zoneinfo/Asia/Manila /etc/localtime
+```
 
 
 Run hwclock to generate /etc/adjtime:  
-`# hwclock --systohc`
+```
+# hwclock --systohc
+```
 
 # Localization
 
 *Uncomment en_US.UTF-8 UTF-8* and other needed locales in `/etc/locale.gen`, and generate them with:  
-`# locale-gen`
+```
+# locale-gen
+```
 
 Create the locale.conf file, and set the LANG variable accordingly:  
-`echo 'LANG=en_US.UTF-8' > /etc/locale.conf`
+```
+echo 'LANG=en_US.UTF-8' > /etc/locale.conf
+```
 
 If you set the keyboard layout, make the changes persistent in vconsole.conf:  
-`echo 'KEYMAP=us' > /etc/vconsole.conf`
+```
+echo 'KEYMAP=us' > /etc/vconsole.conf
+```
 
 
 # Network configuration
 
 Create the hostname file:  
-`echo '*myhostname*' > /etc/hostname`
+```
+echo '*myhostname*' > /etc/hostname
+```
 
 Add matching entries to hosts:  
-`nano /etc/hosts`  
+```
+nano /etc/hosts
+```  
 
 Add this:  
-
-127.0.0.1   localhost  
-::1   localhost  
-127.0.1.1   *hostname*.localdomain	*myhostname*  
+```
+127.0.0.1    localhost  
+::1          localhost  
+127.0.1.1    *hostname*.localdomain	  *myhostname*  
+```
 
 If the system has a permanent IP address, it should be used instead of 127.0.1.1.
 
 # Initramfs  
 Creating a new initramfs is usually not required, because mkinitcpio was run on installation of the kernel package with pacstrap.
 For LVM, system encryption or RAID, modify mkinitcpio.conf and recreate the initramfs image:  
-`# mkinitcpio -P`
+```
+# mkinitcpio -p linux
+```
 
 
 # Root password
 Set the root password:  
-`# passwd`
+```
+# passwd
+```
 
 # Wireless Connections
 For wireless connections, install iw, wpa_supplicant, and (for wifi-menu) dialog:  
-`# pacman -S iw wpa_supplicant dialog`
+```
+# pacman -S iw wpa_supplicant dialog
+```
 
 # Adding Repositories
 Enable multilib and AUR repositories in /etc/pacman.conf:  
-`# nano /etc/pacman.conf`
+```
+# nano /etc/pacman.conf
+```
 
 Uncomment multilib (remove # from the beginning of the lines):  
 [multilib]
 Include = /etc/pacman.d/mirrorlist
 
 Add the following lines at the end of /etc/pacman.conf to enable AUR repo:  
-`[archlinuxfr]
+```
+[archlinuxfr]
 SigLevel = Never
-Server = http://repo.archlinux.fr/$arch`
+Server = http://repo.archlinux.fr/$arch
+```
 
 # Password and Users
 Set password for root:
-`# passwd`
+```
+# passwd
+```
 
 Add a new user with username *YOURUSERNAME*:  
-`# useradd -m -g users -G wheel,storage,power,video,audio,rfkill -s /bin/bash *YOURUSERNAME*`  
+```
+# useradd -m -g users -G wheel,storage,power,video,audio,rfkill -s /bin/bash *YOURUSERNAME*
+```  
 
 Set password for *YOURUSERNAME*:  
-`# passwd YOURUSERNAME`
+```
+# passwd YOURUSERNAME
+```
 
 
 # Add the new user to sudoers:
-`EDITOR=nano visudo`
+```
+EDITOR=nano visudo
+```
 
 Uncomment *# %wheel ALL=(ALL) ALL*
 
-
 # Install the boot loader:  
-`# bootctl install`
+```
+# bootctl install
+```
 
 Create a boot entry:  
-`# nano /boot/loader/entries/arch.conf`
+```
+# nano /boot/loader/entries/arch.conf
+```
 
-`title Arch Linux`  
-`linux /vmlinuz-linux`  
-`initrd  /initramfs-linux.img`  
-`options root=/dev/sda3 rw`
+Add these lines
+
+```
+title Arch Linux  
+linux /vmlinuz-linux  
+initrd  /initramfs-linux.img  
+options root=/dev/sda3 rw
+```
 
 # Exit chroot and reboot:  
-`# exit`
-`# reboot`
+```
+# exit
+# reboot
+```
 
 
 # POST INSTALLATION
 # Pacman  
 **This is for my setup so don't follow it if you don't want to.**
-Basic Xorg apps  
-`sudo pacman -S xorg-server xorg-xrdb xorg-xinit xorg-xkill xclip xorg-xbacklight xorg-xbacklight xorg-xrandr xorg-xdpyinfo xorg-xev`
 
-Graphics  
-`sudo pacman -S xf86-video-intel gstreamer-vaapi`
+| xorg |
+| --- |
+| xorg-server |
+| xorg-xrdb |
+| xorg-xinit |
+| xorg-xbacklight |
+| xorg-xrandr |
+| xorg-xev |
+| xorg-xdpyinfo |
 
-Audio  
-`sudo pacman -S alsa-utils pulseaudio-alsa pulseaudio-bluetooth pulseaudio`
 
-For filesystem  
-`sudo pacman -S unrar unzip p7zip gvfs-mtp libmtp android-udev nemo nemo-fileroller nemo-preview ffmpeg ffmpegthumbnailer ntfs-3g`
+| Video |
+| --- |
+| xf86-video-intel |
+| gstreamer-vaapi |
 
-Browser  
-`sudo pacman -S firefox`
 
-Terminal Emulators  
-`sudo pacman -S kitty xterm`
+| Audio |
+| --- |
+| alsa-utils |
+| pulseaudio-alsa |
+| pulseaudio-bluetooth |
+| pulseaudio |
+| pavucontrol |
+| pulseeffects |
 
-Network  
-`sudo pacman -S networkmanager dhclient modemmanager usb_modeswitch network-manager-applet macchanger mobile-broadband-provider-info aircrack-ng`
+| Filesystem |
+| --- |
+| unrar |
+| unzip |
+| p7zip |
+| gvfs-mtp |
+| libmtp |
+| ntfs-3g |
+| android-udev |
+| nemo |
+| nemo-fileroller |
+| nemo-preview |
+| ffmpeg |
+| ffmpegthumbnailer |
 
-Security  
-`sudo pacman -S tlp ufw`
 
-Bluetooth  
-`sudo pacman -S bluez bluez-utils blueman`
+| Browser |
+| --- | 
+| firefox |  
 
-Misc and tools  
-`sudo pacman -S git neovim atom neofetch pacman-contrib imagemagick maim mupdf acpi redshift arandr lightdm-webkit2-greeter dconf-editor acpid acpi_call`
+| Terminal Emulators  |
+| --- |
+| kitty |
+| xterm |
 
-Settings  
-`sudo pacman -S lxappearance`
+| Network managers |
+| --- |
+| networkmanager |
+| network-manager-applet |
+| dhclient |
+| modemmanager |
+| usb_modeswitch |
+| mobile-broadband-provider-info |
 
-Virualbox  
-`sudo pacman -S virtualbox virtualbox-host-modules-arch linux-headers virtualbox-guest-iso`
+| Network tools |
+| --- |
+| aircrack-ng |
+| macchanger |
 
-Media  
-`sudo pacman -S vlc mpc mpd ncmpcpp  perl-image-exiftool feh pulseeffects flowblade simplescreenrecorder`
+| Maintenance |
+| --- |
+| tlp |
+| ufw |
+| netdata |
+| thinkfan |
+| acpid |
+| acpi_call |
 
-Media editors  
-`sudo pcman -S gimp inkscape`
+| Font |
+| --- |
+| noto-fonts-emoji |
 
-# Yay
-`git clone https://aur.archlinux.org/yay.git`
+| Bluetooth |
+| --- |
+| bluez |
+| bluez-utils |
+| blueman |
 
-AUR apps  
-`yay -S plymouth-git compton-tryone-git cava-git lightdm-webkit-theme-aether awesome-git vicious-git mugshot flat-remix flat-remix-gtk pamac-aur gtk3-nocsd-git`
+| Editors |
+| --- |
+| vim |
+| sub1ime-text |
 
-`yay -S virtualbox-ext-oracle`
+| terminal eyecandies |
+| --- |
+| neofetch |
 
-`yay -S gtk3-mushrooms`
+| tools |
+| --- |
+| imagemagick |
+| dconf-editor |
+| maim |
+| mupdf |
+| redshift |
+| arandr |
 
+| settings |
+| --- |
+| lxappearance |
+| qt5ct |
+| qt5-styleplugins |
+
+| vbox |
+| --- |
+| virtualbox |
+| virtualbox-host-modules-arch |
+| virtualbox-guest-iso |
+| linux-headers |
+| virtualbox-ext-oracle |
+
+| media |
+| --- |
+| vlc |
+| mpd |
+| mpc |
+| ncmpcpp |
+| perl-image-exiftool |
+| feh |
+| simplescreenrecorder |
+
+
+| Media editors |
+| --- |
+| gimp |
+| inkscape |
+
+# Aur helper
+Install `yay`. A Yet another yogurt. Pacman wrapper and AUR helper written in go.
+```
+git clone https://aur.archlinux.org/yay.git
+```
+
+| more aur apps |
+| --- |
+| picom-tryone-git |
+| cava-git |
+| awesome-git |
+| mugshot |
+| flat-remix |
+| flat-remix-gtk |
+| pamac-aur |
+| gtk3-nocsd-git |
+| gtk3-mushrooms |
+| rxvt-unicode-pixbuf |
+| rofi-git |
+| glxinfo |
+| toilet |
+| korla-icon-theme-git |
+| pkhex-bin |
+| oomox-git |
+| ttf-vista-fonts |
