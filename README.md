@@ -41,18 +41,19 @@ The most common main drive is **sda** *I think*
 ```
 
 + **Let’s clean up our main drive to create new partitions for our installation**  
-```
-# gdisk /dev/sda
-```  
-  - Press *x* to enter **expert mode**. Then press *z* to **zap** our drive. Just hit *y* when prompted about wiping out GPT and blanking out MBR.  
+
+  ```
+  # gdisk /dev/sda
+  ```  
+  - Press *x* to enter **expert mode**. Then press **z** to *zap* our drive. Just hit *y* when prompted about wiping out GPT and blanking out MBR.  
   
-Remember *x* button is to enter export mode and *z* is to zap or wipe-out the drive. **Think carefully before pressing Y you can't undo this!**
+Remember **x** button is to *enter expert mode* and **z** is *to zap* or wipe-out the drive. **Think carefully before pressing Y you can't undo this!**
 
 + **Now let’s create our partitions**  
 
-```
-# cgdisk
-```
+  ```
+  # cgdisk
+  ```
   - Enter the device filename of your main drive, e.g. /dev/sda. Just press enter when warned about damaged GPT.
 
 Now we should be presented with our main drive showing the partition number, partition size, partition type, and partition name. If you see list of partitions, delete all those first.
@@ -91,16 +92,16 @@ Now we should be presented with our main drive showing the partition number, par
     + Also hit enter for the GUID to select default.
     + Then set name of the partition to home.
 
-Lastly, hit *Write* at the bottom of the patitions list to write the changes to the disk. Type *yes* to confirm the write command. Now we are done partitioning the disk. Hit *Quit* to exit cgdisk.
+Lastly, hit **Write** at the bottom of the patitions list *to write the changes to the disk*. Type **yes** *to confirm* the write command. Now we are done partitioning the disk. Hit **Quit** *to exit cgdisk*.
 
 
 # FORMATTING PARTITIONS
 
 + **Let’s see the new partition list**
 
-```
-# lsblk
-```
+  ```
+  # lsblk
+  ```
 
 **You should see something LIKE:**
 
@@ -120,23 +121,23 @@ Lastly, hit *Write* at the bottom of the patitions list to write the changes to 
 
 + **Format the boot partition as FAT32**  
 
-```
-# mkfs.fat -F32 /dev/sda1
-```  
+  ```
+  # mkfs.fat -F32 /dev/sda1
+  ```  
 
 + **Enable the swap partition**  
 
-```
-# mkswap /dev/sda2  
-# swapon /dev/sda2
-```  
+  ```
+  # mkswap /dev/sda2  
+  # swapon /dev/sda2
+  ```  
 
 + **Format home and root partition as ext4**  
 
-```
-# mkfs.ext4 /dev/sda3  
-# mkfs.ext4 /dev/sda4
-```  
+  ```
+  # mkfs.ext4 /dev/sda3  
+  # mkfs.ext4 /dev/sda4
+  ```  
 
 
 # Connect to internet  
@@ -169,9 +170,9 @@ First we need to mount the partitions that we created earlier to their appropria
 
 + Mount the root partition:  
 
-```
-# mount /dev/sda3 /mnt
-```  
+  ```
+  # mount /dev/sda3 /mnt
+  ```  
 
 *If /mnt doesn't exists create it*  
 ```
@@ -180,17 +181,17 @@ mkdir /mnt
 
 + Mount the boot partition  
 
-```
-# mkdir /mnt/boot  
-# mount /dev/sda1 /mnt/boot
-```  
+  ```
+  # mkdir /mnt/boot  
+  # mount /dev/sda1 /mnt/boot
+  ```  
 
 + Mount the home partion  
 
-```
-# mkdir /mnt/home
-#  mount /dev/sda4 /mnt/home
-``` 
+  ```
+  # mkdir /mnt/home
+  #  mount /dev/sda4 /mnt/home
+  ``` 
 
 We don’t need to mount **swap** since it is already enabled.  
 
@@ -208,9 +209,9 @@ Just hit enter/yes for all the prompts that come up. Wait for Arch to finish ins
 
 + **Now let’s generate our fstab file**  
 
-```
-# genfstab -U /mnt >> /mnt/etc/fstab
-```  
+  ```
+  # genfstab -U /mnt >> /mnt/etc/fstab
+  ```  
 
 
 # Configuration
@@ -373,7 +374,7 @@ options root=/dev/sda3 rw
 
 
 # POST INSTALLATION
-# Pacman  
+## My Personal Applications
 **This is for my setup so don't follow it if you don't want to.**
 
 | xorg |
@@ -509,9 +510,11 @@ options root=/dev/sda3 rw
 | inkscape |
 
 # Aur helper
-Install `yay`. A Yet another yogurt. Pacman wrapper and AUR helper written in go.
+Install `yay`, a *Yet another yogurt. Pacman wrapper and AUR helper written in go.*
 ```
 git clone https://aur.archlinux.org/yay.git
+cd yay
+makepkg -sri
 ```
 
 | more aur apps |
