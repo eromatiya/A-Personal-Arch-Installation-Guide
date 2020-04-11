@@ -119,11 +119,11 @@ You should see something like this:
 | sda3 | 8:3 | 0 | 175G | 0 | part | / |
 | sda4 | 8:4 | 0 | 300G | 0 | part | /home  |
 
-**`sda`** is the hard drive
-**`sda1`** is the boot partition
-**`sda2`** is the swap partition
-**`sda3`** is the home partition
-**`sda4`** is the root partition
+**`sda`** is the hard drive  
+**`sda1`** is the boot partition  
+**`sda2`** is the swap partition  
+**`sda3`** is the home partition  
+**`sda4`** is the root partition  
 
 **Format the boot partition as FAT32**  
 
@@ -163,9 +163,9 @@ You should see something like this:
     link/ether 00:00:00:00:00:00 brd ff:ff:ff:ff:ff:ff permaddr 00:00:00:00:00:00
 ```
 
-**Where:**
-**`enp0s30`** is the wired interface
-**`wlp7s0`** is the wireless interface
+**Where:**  
+**`enp0s30`** is the wired interface  
+**`wlp7s0`** is the wireless interface  
 
 If you are on a wired connection, you can enable your wired interface by systemctl start dhcpcd@<interface>.  
 
@@ -200,10 +200,10 @@ Mount the **`root`** partition:
 $ mount /dev/sda3 /mnt
 ```  
 
-**If `/mnt` doesn't exists create it.**
+**If `/mnt` doesn't exist create it.**
 
 ```
-mkdir /mnt
+$ mkdir /mnt
 ```  
 
 Mount the **`boot`** partition  
@@ -232,7 +232,7 @@ So let's also install the packages detached from the base group.
 $ pacstrap /mnt base linux linux-firmware base-devel less logrotate man-db man-pages which dhcpcd inetutils jfsutils mdadm perl reiserfsprogs sysfsutils systemd-sysvcompat texinfo usbutils xfsprogs s-nail netctl nano iputils
 ```
 
-It's your decision if you want to install the packages.  
+It's your decision if you want to all install the packages.
 
 Just hit enter/yes for all the prompts that come up. Wait for Arch to finish installing the base, linux and base-devel and other packages.  
 
