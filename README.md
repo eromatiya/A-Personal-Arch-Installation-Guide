@@ -424,7 +424,7 @@ $ reboot
 
 ## POST INSTALLATION
 
-After booting up, you will be greeted by TTY. Still, there's no sign of GUI everywhere. So we need to install it. But before that, we need an internet connection! Follow this [guide](#connect-to-internet).
+After booting up, you will be greeted by TTY. Still, there's no sign of GUI everywhere. So we need to install it. But before that, we need an internet connection! Follow this [guide](#connect-to-internet). Make sure to open the guide in a new tab, otherwise this page will scroll up instead and I think you don't want that.
 
 Now that you have an internet connection, you need to install a graphical server - `xorg` or `wayland`. I'm using `AwesomeWM` as my window manager and it only runs on `X`, sooo let's install `X`.
 
