@@ -6,7 +6,7 @@
 
 Arch changed a lot of things in packaging like removing a lot of packages in base group. I will mostly forgot those yet again, so I need this guide for myself.
 
-I'm using GPT and systemd-boot in my installation.  
+I'm using GPT and systemd-boot in my installation. My system is `Lenovo X230`, so this guide will not provide the installation of proprietary drivers. **🖕, Nvidia** - Linus Torvalds.
 
 ### Set the keyboard layout
 The default console keymap is US. Available layouts can be listed with:
