@@ -423,63 +423,77 @@ $ reboot
 
 
 ## POST INSTALLATION
-### My Personal Applications
-**This is for my setup so don't follow it if you don't want to.**
 
-| xorg |
-| --- |
-| xorg-server |
-| xorg-xrdb |
-| xorg-xinit |
-| xorg-xbacklight |
-| xorg-xrandr |
-| xorg-xev |
-| xorg-xdpyinfo |
+After booting up, you will be greeted by TTY. Still, there's no sign of GUI everywhere. So we need to install it. But before that, we need an internet connection! Follow this [guide](#connect-to-internet).
 
+Now that you have an internet connection, you need to install a graphical server - `xorg` or `wayland`. I'm using `AwesomeWM` as my window manager and it only runs on `X`, sooo let's install `X`.
 
-| Video |
-| --- |
-| xf86-video-intel |
-| gstreamer-vaapi |
-| vulkan-intel |
-| lib32-vulkan-intel | 
-| vulkan-icd-loader | 
-| lib32-vulkan-icd-loader |
-| lib32-mesa |
+```bash
+$ sudo pacman -S xorg-server xorg-xrdb xorg-xinit xorg-xrandr xorg-xev xorg-xdpyinfo xorg-xprop
+```
 
-| Audio |
-| --- |
-| alsa-utils |
-| pulseaudio-alsa |
-| pulseaudio-bluetooth |
-| pulseaudio |
-| pavucontrol |
-| pulseeffects |
+After installing the graphical server, we need to install the video drivers. I'm using an integrated intel graphics card.
 
-| Filesystem |
-| --- |
-| unrar |
-| unzip |
-| p7zip |
-| gvfs-mtp |
-| libmtp |
-| ntfs-3g |
-| android-udev |
-| nemo |
-| nemo-fileroller |
-| nemo-preview |
-| ffmpeg |
-| ffmpegthumbnailer |
+```bash
+$ sudo pacman -S xf86-video-intel vulkan-intel vulkan-intel lib32-vulkan-intel vulkan-icd-loader lib32-vulkan-icd-loader lib32-mesa
+```
 
+Install audio drivers
 
-| Browser |
-| --- | 
-| firefox |  
+```bash
+$ sudo pacman -S alsa-utils pulseaudio-alsa pulseaudio-bluetooth pulseaudio pavucontrol pulseeffects
+```
 
-| Terminal Emulators  |
-| --- |
-| kitty |
-| xterm |
+Install file system tools and file manager
+
+```bash
+$ sudo pacman -S unrar unzip p7zip gvfs-mtp libmtp ntfs-3g android-udev ffmpegthumbnailer dolphin ranger mtpfs
+```
+
+Web browser
+
+```bash
+$ sudo pacman -S firefox w3m
+```
+
+Of course, we need a terminal emulator
+
+```bash
+$ sudo pacman -S kitty xterm
+```
+
+Install git and an AUR helper.
+
+```bash
+$ sudo pacman -S git go
+```
+
+`yay` will be our AUR helper. `go` and `base-devel` is a dependency of `yay, so make sure you have it first. To install `yay`:
+
+```bash
+$ git clone https://aur.archlinux.org/yay.git
+$ cd yay
+$ makepkg -sri
+```
+
+Install your desktop environment or window manager. I'm using `awesomewm`.
+
+```bash
+$ yay -S awesome-git --noconfirm --removemake
+```
+
+Install a compositor, I will be using `picom-tryone-git` for AUR.
+
+```bash
+$ yay -S picom-tryone-git --noconfirm --removemake
+```
+
+Install an application launcher. We will use `rofi-git`.
+
+```bash
+$ yay -S rofi-git --noconfirm --removemake
+```
+
 
 | Network managers |
 | --- |
@@ -550,6 +564,7 @@ $ reboot
 | --- |
 | vlc |
 | mpd |
+ffmpeg
 | mpc |
 | ncmpcpp |
 | perl-image-exiftool |
