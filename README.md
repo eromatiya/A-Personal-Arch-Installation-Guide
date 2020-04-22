@@ -424,6 +424,8 @@ $ reboot
 
 ## POST INSTALLATION
 
+#### Install X server
+
 After booting up, you will be greeted by TTY. Still, there's no sign of GUI everywhere. So we need to install it. But before that, we need an internet connection! Follow this [guide](#connect-to-internet). Make sure to open the guide in a new tab, otherwise this page will scroll up instead and I think you don't want that.
 
 Now that you have an internet connection, you need to install a graphical server - `xorg` or `wayland`. I'm using `AwesomeWM` as my window manager and it only runs on `X`, sooo let's install `X`.
@@ -432,29 +434,45 @@ Now that you have an internet connection, you need to install a graphical server
 $ sudo pacman -S xorg-server xorg-xrdb xorg-xinit xorg-xrandr xorg-xev xorg-xdpyinfo xorg-xprop
 ```
 
+#### Install video drivers
+
 After installing the graphical server, we need to install the video drivers. I'm using an integrated intel graphics card.
 
 ```bash
 $ sudo pacman -S xf86-video-intel vulkan-intel vulkan-intel lib32-vulkan-intel vulkan-icd-loader lib32-vulkan-icd-loader lib32-mesa
 ```
 
-Install audio drivers
+Add your (kernel) graphics driver to your initramfs. For example, if using intel: 
+
+```bash
+$ sudoedit /etc/mkinitcpio.conf
+```
+
+Then add `i915` to your initramfs:
+
+```
+MODULES=(i915 ...)
+```
+
+#### Install audio drivers
 
 ```bash
 $ sudo pacman -S alsa-utils pulseaudio-alsa pulseaudio-bluetooth pulseaudio pavucontrol pulseeffects
 ```
 
-Install file system tools and file manager
+#### Install file system tools and file manager
 
 ```bash
-$ sudo pacman -S unrar unzip p7zip gvfs-mtp libmtp ntfs-3g android-udev ffmpegthumbnailer dolphin ranger mtpfs
+$ sudo pacman -S unrar unzip p7zip gvfs-mtp libmtp ntfs-3g android-udev ffmpegthumbnailer mtpfs dolphin ranger
 ```
 
-Web browser
+#### Install GUI and CLI web browser
 
 ```bash
 $ sudo pacman -S firefox w3m
 ```
+
+#### Terminal Emulator
 
 Of course, we need a terminal emulator
 
@@ -462,19 +480,27 @@ Of course, we need a terminal emulator
 $ sudo pacman -S kitty xterm
 ```
 
-Install git and an AUR helper.
+#### Install GIT
 
 ```bash
 $ sudo pacman -S git go
 ```
 
-`yay` will be our AUR helper. `go` and `base-devel` is a dependency of `yay, so make sure you have it first. To install `yay`:
+#### Install an AUR helper
+
+`yay` will be our AUR helper. `go` and `base-devel` is a dependency of `yay`, so make sure you have it first. To install `yay`:
 
 ```bash
+# Install the go package
+$ sudo pacman -S go
+# Clone the repo
 $ git clone https://aur.archlinux.org/yay.git
 $ cd yay
+# Compile, build and install
 $ makepkg -sri
 ```
+
+#### GUI Environment
 
 Install your desktop environment or window manager. I'm using `awesomewm`.
 
@@ -482,32 +508,202 @@ Install your desktop environment or window manager. I'm using `awesomewm`.
 $ yay -S awesome-git --noconfirm --removemake
 ```
 
-Install a compositor, I will be using `picom-tryone-git` for AUR.
+#### Install a compositor
+
+I will be using `picom-tryone-git` for AUR.
 
 ```bash
 $ yay -S picom-tryone-git --noconfirm --removemake
 ```
 
-Install an application launcher. We will use `rofi-git`.
+#### Install an application launcher. 
+
+We will use `rofi-git`.
 
 ```bash
 $ yay -S rofi-git --noconfirm --removemake
 ```
 
+#### Plymouth
 
-| Network managers |
-| --- |
-| networkmanager |
-| network-manager-applet |
-| dhclient |
-| modemmanager |
-| usb_modeswitch |
-| mobile-broadband-provider-info |
+Plymouth provides a flicker-free graphical boot process.
+
+```bash
+# Install
+$ yay -S plymouth-git
+# If you also use GDM, you should install the gdm-plymouth, which compiles gdm with plymouth support. 
+$ yay -S gdm-plymouth
+```
+
+Add plymouth to the HOOKS array in mkinitcpio.conf. It must be added after base and udev for it to work: 
+
+```bash
+$ sudoedit /etc/mkinitcpio.conf
+```
+
+Put `plymouth` after base and udev:
+
+```
+HOOKS=(base udev plymouth ...)
+```
+
+Set the theme.
+
+```bash
+# List all the installed plymouth theme
+$ sudo plymouth-set-default-theme -l
+# Select a theme then rebuild  initrd
+$ sudo plymouth-set-default-theme -R theme_name
+```
+
+You now need to append the `quiet splash loglevel=3 rd.udev.log_priority=3 vt.global_cursor_default=0` kernel parameters. See [Silent Boot](#silent-boot).
+
+#### Install missing kernel modules.
+
+```bash
+$ yay -S wd719x-firmware aic94xx-firmware --removemake --noconfirm
+$ sudo mkinitcpio -p linux
+```
+
+#### Silent boot
+
+This is for who prefer to limit the verbosity of their system to a strict minimum, either for aesthetics or other reasons. 
+
+Edit boot loader kernel parameters:
+
+```bash
+$ sudoedit /boot/loader/entries/arch.conf
+```
+
+Add these lines at the bottom of the file then save:
+
+```
+options quiet splash loglevel=3 vga=current rd.udev.log_priority=3
+```
+
+#### Microcode
+
+Processor manufacturers release stability and security updates to the processor microcode. These updates provide bug fixes that can be critical to the stability of your system. Without them, you may experience spurious crashes or unexpected system halts that can be difficult to track down. 
+
+```bash
+# For AMD processors
+$ sudo pacman -S amd-ucode
+# For intel processors
+$ sudo pacman -S intel-ucode
+```
+
+If your Arch installation is on a removable drive that needs to have microcode for both manufacturer processors, install both packages. 
+
+Load  microcode. For systemd-boot, use the `initrd` option to load the microcode, before the initial ramdisk, as follows:
+
+```bash
+$ sudoedit /boot/loader/entries/entry.conf
+```
+
+```
+title   Arch Linux
+linux   /vmlinuz-linux
+initrd  /cpu_manufacturer-ucode.img
+initrd  /initramfs-linux.img
+...
+```
+
+Change `cpu_manufacturer-ucode` with either `amd` or `intel` depending on your processors.
+
+#### Display Manager
+
+A display manager, or login manager, is typically a graphical user interface that is displayed at the end of the boot process in place of the default shell.
+
+There's a ton of display manager out there. I'm using sddm so this guide will cover that. First, install it:
+
+```bash
+$ sudo pacman -S sddm
+```
+
+To enable graphical login, enable the appropriate systemd service. For example, for SDDM, enable `sddm.service`.  In this case we will enable `sddm-plymouth.service` just because we're using plymouth.
+
+Install a theme. I'm using the `Sugar Candy` theme.
+
+```bash
+$ yay -S sddm-theme-sugar-candy-git
+```
+
+Configure the theme by:
+
+```bash
+$ sudoedit /usr/share/sddm/themes/Sugar-Candy/theme.conf
+```
+
+#### Reboot then Login
+
+We're almost there! You can now login to you system with all the configuration we've done so far. 
+
+```bash
+$ reboot
+```
+
+#### Install and Configure Network Manager
+
+As of now, we're using `netctl` if we're using wireless connection and `dhcpcd` if we're on wired connection. So it's time to install a GUI to connect to the internet.
+
+```bash
+$ sudo pacman -S networkmanager network-manager-applet dhclient modemmanager usb_modeswitch mobile-broadband-provider-info
+```
+
+Disable netctl or dhcpcd.
+
+```bash
+# If using netctl
+# Stop current connection
+$ sudo netctl stop profile_name
+$ sudo netctl disable profile_name
+$ sudo systemctl stop netctl
+$ sudo systemctl disable netctl
+
+# If using dhcpcd
+$ sudo systemctl stop dhcpcd
+$ sudo systemctl disable dhcpcd
+```
+
+Enable Network Manager service.
+
+```bash
+# If using dhcpcd
+$ sudo systemctl enable NetworkManger
+$ sudo systemctl start NetworkManger
+```
+
+Sometimes you have to reboot if you cannot connect using the NetworkManger.
+
+Optional:
+
+Run `network-manager-applet` to have the network manager applet in you system tray. 
+
+Enable MAC randomization. MAC randomization can be used for increased privacy by not disclosing your real MAC address to the network. 
+
+Install macchanger.
+
+```bash
+$ sudo pacman -S macchanger
+```
+
+Create `30-mac-randomization.conf` in your `/etc/NetworkManager/conf.d/`. Add this:
+
+```
+[device-mac-randomization]
+# "yes" is already the default for scanning
+wifi.scan-rand-mac-address=yes
+
+[connection-mac-randomization]
+ethernet.cloned-mac-address=random
+wifi.cloned-mac-address=stable
+```
+
+## To be continued ...
 
 | Network tools |
 | --- |
 | aircrack-ng |
-| macchanger |
 
 | Maintenance |
 | --- |
