@@ -50,8 +50,8 @@ $ lsblk
 $ gdisk /dev/sda
 ```
 
-  Press <kbd>x</kbd> to enter **expert mode**. Then press <kbd>z</kbd> to *zap* our drive. Then hit <kbd>y</kbd> when prompted about wiping out GPT and blanking out MBR.  
-  
+	Press <kbd>x</kbd> to enter **expert mode**. Then press <kbd>z</kbd> to *zap* our drive. Then hit <kbd>y</kbd> when prompted about wiping out GPT and blanking out MBR.  
+	
 **NOTE:**  
 Remember that pressing <kbd>x</kbd> button will put you to *expert mode* and <kbd>z</kbd> will *zap* or wipe-out the drive. **Think carefully before pressing <kbd>Y</kbd> you can't undo this!**
 
@@ -66,37 +66,37 @@ Now we should be presented with our main drive showing the partition number, par
 
 **Let’s create our boot partition**  
 
-   + Hit New from the options at the bottom.
-   + Just hit enter to select the default option for the first sector.
-   + Now the partion size - Arch wiki recommends 200-300 MB for the boot + size. Let’s make it 500MiB or 1GB in case we need to add more OS to our machine. I’m gonna assign mine with 1024MiB. Hit enter.
-   + Set GUID to **EF00**. Hit enter.
-   + Set name to boot. Hit enter.
-   + Now you should see the new partition in the partitions list with a partition type of EFI System and a partition name of boot. You will also notice there is 1007KB above the created partition. That is the MBR. Don’t worry about that and just leave it there.
+	 + Hit New from the options at the bottom.
+	 + Just hit enter to select the default option for the first sector.
+	 + Now the partion size - Arch wiki recommends 200-300 MB for the boot + size. Let’s make it 500MiB or 1GB in case we need to add more OS to our machine. I’m gonna assign mine with 1024MiB. Hit enter.
+	 + Set GUID to **EF00**. Hit enter.
+	 + Set name to boot. Hit enter.
+	 + Now you should see the new partition in the partitions list with a partition type of EFI System and a partition name of boot. You will also notice there is 1007KB above the created partition. That is the MBR. Don’t worry about that and just leave it there.
 
 **Create the swap partition**
 
-   + Hit New again from the options at the bottom of partition list.
-   + Just hit enter to select the default option for the first sector.
-   + For the swap partition size, it is advisable to have 1.5 times the size of your RAM. I have 8GB of RAM so I’m gonna put 12GiB for the partition size. Hit enter.
-   + Set GUID to **8200**. Hit enter.
-   + Set name to swap. Hit enter.
+	 + Hit New again from the options at the bottom of partition list.
+	 + Just hit enter to select the default option for the first sector.
+	 + For the swap partition size, it is advisable to have 1.5 times the size of your RAM. I have 8GB of RAM so I’m gonna put 12GiB for the partition size. Hit enter.
+	 + Set GUID to **8200**. Hit enter.
+	 + Set name to swap. Hit enter.
 
 **Create the root partition**
 
-   + Hit New again.
-   + Hit enter to select the default option for the first sector.
-   + Hit enter again to input your root size.
-   + Also hit enter for the GUID to select default.
-   + Then set name of the partition to root.
+	 + Hit New again.
+	 + Hit enter to select the default option for the first sector.
+	 + Hit enter again to input your root size.
+	 + Also hit enter for the GUID to select default.
+	 + Then set name of the partition to root.
 
 
 **Create the home partition**
 
-   + Hit New again.
-   + Hit enter to select the default option for the first sector.
-   + Hit enter again to use the remainder of the disk.
-   + Also hit enter for the GUID to select default.
-   + Then set name of the partition to home.
+	 + Hit New again.
+	 + Hit enter to select the default option for the first sector.
+	 + Hit enter again to use the remainder of the disk.
+	 + Also hit enter for the GUID to select default.
+	 + Then set name of the partition to home.
 
 Lastly, hit **Write** at the bottom of the patitions list to *write the changes* to the disk. Type `yes` to *confirm* the write command. Now we are done partitioning the disk. Hit **Quit** *to exit cgdisk*.
 
@@ -156,11 +156,11 @@ $ ip link
 You should see something like this:
 ```
 1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN mode DEFAULT group default qlen 1000
-    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+		link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
 2: enp0s30: <NO-CARRIER,BROADCAST,MULTICAST,UP> mtu 1500 qdisc fq_codel state DOWN mode DEFAULT group default qlen 1000
-    link/ether 00:00:00:00:00:00 brd ff:ff:ff:ff:ff:ff
+		link/ether 00:00:00:00:00:00 brd ff:ff:ff:ff:ff:ff
 3: wlp7s0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc mq state UP mode DORMANT group default qlen 1000
-    link/ether 00:00:00:00:00:00 brd ff:ff:ff:ff:ff:ff permaddr 00:00:00:00:00:00
+		link/ether 00:00:00:00:00:00 brd ff:ff:ff:ff:ff:ff permaddr 00:00:00:00:00:00
 ```
 
 **Where:**  
@@ -700,6 +700,68 @@ wifi.cloned-mac-address=stable
 ```
 
 ## To be continued ...
+
+
+#### Better Font Rendering
+
+Make your system's fonts beautiful great again! Improve your fonts for system-wide usage without installing a patched font library packages like the `Infinality`.
+
+Install these fonts, for example:
+
+```bash
+$ sudo pacman -S ttf-dejavu ttf-liberation noto-fonts
+```
+
+Enable font presets by creating symbolic links:
+
+```bash
+$ sudo ln -s /etc/fonts/conf.avail/70-no-bitmaps.conf /etc/fonts/conf.d
+$	sudo ln -s /etc/fonts/conf.avail/10-sub-pixel-rgb.conf /etc/fonts/conf.d
+$	sudo ln -s /etc/fonts/conf.avail/11-lcdfilter-default.conf /etc/fonts/conf.d
+```
+The above will disable embedded bitmap for all fonts, enable sub-pixel RGB rendering, and enable the LCD filter which is designed to reduce colour fringing when subpixel rendering is used.
+
+For font consistency, all applications should be set to use the serif, sans-serif, and monospace aliases, which are mapped to particular fonts by fontconfig.
+
+Create `/etc/fonts/local.conf`, then add:
+
+```xml
+<?xml version="1.0"?>
+<!DOCTYPE fontconfig SYSTEM "fonts.dtd">
+<fontconfig>
+		<match>
+				<edit mode="prepend" name="family">
+					<string>SF Pro Text</string>
+				</edit>
+		</match>
+		<match target="pattern">
+				<test qual="any" name="family">
+						<string>serif</string>
+				</test>
+				<edit name="family" mode="assign" binding="same">
+						<string>Noto Serif</string>
+				</edit>
+		</match>
+		<match target="pattern">
+				<test qual="any" name="family">
+					<string>sans-serif</string></test>
+				<edit name="family" mode="assign" binding="same">
+						<string>Noto Sans</string>
+				</edit>
+		</match>
+		<match target="pattern">
+				<test qual="any" name="family">
+					<string>monospace</string>
+				</test>
+				<edit name="family" mode="assign" binding="same">
+						<string>Noto Mono</string></edit>
+		</match>
+</fontconfig>
+```
+
+Set your font settings to match above in your DE system settings.
+
+
 
 | Network tools |
 | --- |
