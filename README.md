@@ -940,7 +940,7 @@ $ sudo ufw app list
 
 You can find all these settings, with their default values, by accessing the URL `http://localhost:19999/netdata.conf`.
 
-Access NetData via a Web browser by accessing <http://localhost:19999/netdata.conf>.
+Access NetData via a Web browser by accessing <http://localhost:19999>.
 
 
 #### And that's it! We covered all the must-have part! Now, it's time for basic ricing. :)
