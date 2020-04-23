@@ -1,4 +1,4 @@
-# A PERSONAL Arch Installation Guide
+# A Personal Arch Installation Guide
 
 
 #### This is a personal guide so if you're lost and just found this guide from somewhere, I recommend you to read the official [`wiki`](https://wiki.archlinux.org/index.php/Installation_guide)! This guide will focus on systemd-boot and UEFI setups, so we will not use `grub`. 
@@ -71,37 +71,37 @@ Now we should be presented with our main drive showing the partition number, par
 
 #### Let’s create our boot partition
 
-	 +   Hit New from the options at the bottom.
-	 +   Just hit enter to select the default option for the first sector.
-	 +   Now the partion size - Arch wiki recommends 200-300 MB for the boot + size. Let’s make it 500MiB or 1GB in case we need to add more OS to our machine. I’m gonna assign mine with 1024MiB. Hit enter.
-	 +   Set GUID to **EF00**. Hit enter.
-	 +   Set name to boot. Hit enter.
-	 +   Now you should see the new partition in the partitions list with a partition type of EFI System and a partition name of boot. You will also notice there is 1007KB above the created partition. That is the MBR. Don’t worry about that and just leave it there.
++   Hit New from the options at the bottom.
++   Just hit enter to select the default option for the first sector.
++   Now the partion size - Arch wiki recommends 200-300 MB for the boot + size. Let’s make it 500MiB or 1GB in case we need to add more OS to our machine. I’m gonna assign mine with 1024MiB. Hit enter.
++   Set GUID to **EF00**. Hit enter.
++   Set name to boot. Hit enter.
++   Now you should see the new partition in the partitions list with a partition type of EFI System and a partition name of boot. You will also notice there is 1007KB above the created partition. That is the MBR. Don’t worry about that and just leave it there.
 
 #### Create the swap partition
 
-	 +   Hit New again from the options at the bottom of partition list.
-	 +   Just hit enter to select the default option for the first sector.
-	 +   For the swap partition size, it is advisable to have 1.5 times the size of your RAM. I have 8GB of RAM so I’m gonna put 12GiB for the partition size. Hit enter.
-	 +   Set GUID to **8200**. Hit enter.
-	 +   Set name to swap. Hit enter.
++   Hit New again from the options at the bottom of partition list.
++   Just hit enter to select the default option for the first sector.
++   For the swap partition size, it is advisable to have 1.5 times the size of your RAM. I have 8GB of RAM so I’m gonna put 12GiB for the partition size. Hit enter.
++   Set GUID to **8200**. Hit enter.
++   Set name to swap. Hit enter.
 
 #### Create the root partition
 
-	 +   Hit New again.
-	 +   Hit enter to select the default option for the first sector.
-	 +   Hit enter again to input your root size.
-	 +   Also hit enter for the GUID to select default.
-	 +   Then set name of the partition to root.
++   Hit New again.
++   Hit enter to select the default option for the first sector.
++   Hit enter again to input your root size.
++   Also hit enter for the GUID to select default.
++   Then set name of the partition to root.
 
 
 #### Create the home partition
 
-	 +   Hit New again.
-	 +   Hit enter to select the default option for the first sector.
-	 +   Hit enter again to use the remainder of the disk.
-	 +   Also hit enter for the GUID to select default.
-	 +   Then set name of the partition to home.
++   Hit New again.
++   Hit enter to select the default option for the first sector.
++   Hit enter again to use the remainder of the disk.
++   Also hit enter for the GUID to select default.
++   Then set name of the partition to home.
 
 Lastly, hit **Write** at the bottom of the patitions list to *write the changes* to the disk. Type `yes` to *confirm* the write command. Now we are done partitioning the disk. Hit **Quit** *to exit cgdisk*.
 
@@ -531,7 +531,7 @@ $ sudo pacman -S git
 
 #### Install an AUR helper
 
-`yay` will be our AUR helper. `go` and `base-devel` is a dependency of `yay`, so make sure you have it first. To install `yay`:
+`yay` will be our AUR helper. `go` and `base-devel` are a dependency of `yay`, so make sure you have it first. To install `yay`:
 
 ```bash
 # Install the go package
@@ -1041,20 +1041,6 @@ $ sudo pacman -S ttf-dejavu ttf-liberation noto-fonts noto-fonts-emoji
 $ yay -S otf-san-francisco-pro otf-sfmono-patched 
 ```
 
-#### Install a Cursor theme
-
-Let's make the cursor theme more modern looking!
-
-[`Vimix Cursor`](https://github.com/vinceliuice/Vimix-cursors) is a beautiful theme! It can be found in the AUR.
-
-1. Install the theme.
-
-	```bash
-	$ yay -S vimix-cursors
-	```
-
-2. Set the theme in your `qt5ct` and `lxappearance`.
-
 #### Improve Font Rendering
 
 Make your system fonts great again! Improve your fonts for system-wide usage without installing a patched font library packages like the `Infinality`.
@@ -1118,6 +1104,19 @@ Make your system fonts great again! Improve your fonts for system-wide usage wit
 
 You can also follow this [guide](https://jichu4n.com/posts/how-to-set-default-fonts-and-font-aliases-on-linux/).
 
+#### Install a Cursor theme
+
+Let's make the cursor theme more modern looking!
+
+[`Vimix Cursor`](https://github.com/vinceliuice/Vimix-cursors) is a beautiful theme! It can be found in the AUR.
+
+1. Install the theme.
+
+	```bash
+	$ yay -S vimix-cursors
+	```
+
+2. Set the theme in your `qt5ct` and `lxappearance`.
 
 #### Improve Terminal Experience
 
@@ -1287,3 +1286,7 @@ So the real question is why did the `GNOME` team keeps removing the best feature
 **`pamac-aur`** as frontend for libalpm  
 **`toilet`** as ascii generator tool  
 **`dconf-editor`** as dconf editor  
+
+#### Hotel
+
+**`trivago`** as hotel
