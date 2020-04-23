@@ -1223,6 +1223,28 @@ After rebooting, let's now improve the `zsh` prompt.
 
 More info about Powerlevel10k [here](https://github.com/romkatv/powerlevel10k)
 
+#### Use `gtk3-mushrooms` a patched GTK3
+
+One of the things I don't like is using GTK3 apps that have a CSD or client-side decoration with a window manager. It removes the unified look because some apps have CSDs and some don't. That's why I'm using a patched version of `GTK3` called [`gtk3-mushrooms`](https://github.com/krumelmonster/gtk3-mushrooms). `gtk3-mushrooms` is a set of patches for GTK3 library that makes it better.
+
+Install `gtk3-mushrooms` and replace the vanilla `gtk3`.
+
+```zsh
+$ yay -S gtk3-mushrooms
+```
+
+Notable changes after installing `gtk3-mushrooms`:
+
++ CSDs are totally disabled by default.
++ Typeahead feature is restored.
++ Message dialogs have traditional appearance with left-aligned texts and right-aligned buttons.
++ Scrollbars are always visible. You can enable invisible scrollbars by `GTK_OVERLAY_SCROLLING=1` environment variable.
++ Labels are wrapped similarly to GTK2. This patch fixes too wide windows in applications improperly ported from GTK2.
++ Any many more!
+
+So the real question is why did the `GNOME` team keeps removing the best features and adding things nobody ask for? Just kidding!
+
+
 | Network tools |
 | --- |
 | aircrack-ng |
