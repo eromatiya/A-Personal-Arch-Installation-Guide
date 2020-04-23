@@ -6,18 +6,18 @@
 
 Arch changed a lot of things in packaging like removing a lot of packages in base group. I will mostly forgot those yet again, so I need this guide for myself.
 
-I'm using GPT and systemd-boot in my installation. My system is `Lenovo X230`, so this guide will not provide the installation of proprietary drivers. **🖕, Nvidia** - Linus Torvalds.
+I'm using GPT and systemd-boot in my installation. My system is `Lenovo X230`, so this guide will not cover the installation of proprietary drivers. **🖕, Nvidia** - Linus Torvalds.
 
 ### Set the keyboard layout
 The default console keymap is US. Available layouts can be listed with:
 
-```
+```bash
 $ ls /usr/share/kbd/keymaps/**/*.map.gz
 ```
 
 To modify the layout, append a corresponding file name to loadkeys, omitting path and file extension. For example, to set a US keyboard layout:  
 
-```
+```bash
 $ loadkeys us
 ```
 
@@ -25,7 +25,7 @@ $ loadkeys us
 ### Update the system clock
 Use timedatectl to ensure the system clock is accurate:
 
-```
+```bash
 $ timedatectl set-ntp true
 ```
 
@@ -33,20 +33,20 @@ $ timedatectl set-ntp true
 **Verify the boot mode**
 If UEFI mode is enabled on an UEFI motherboard, Archiso will boot Arch Linux accordingly via systemd-boot. To verify this, list the efivars directory:  
 
-```
+```bash
 $ ls /sys/firmware/efi/efivars
 ```
 
 **Check the drives**
 The most common main drive is **sda**.
 
-```
+```bash
 $ lsblk
 ```
 
 **Let’s clean up our main drive to create new partitions for our installation**  
 
-```
+```bash
 $ gdisk /dev/sda
 ```
 
@@ -57,7 +57,7 @@ Remember that pressing <kbd>x</kbd> button will put you to *expert mode* and <kb
 
 **Now let’s create our partitions**  
 
-```
+```bash
 $ cgdisk
 ```
 Enter the device filename of your main drive, e.g. `/dev/sda`. Just press <kbd>Return</kbd> when warned about damaged GPT.
@@ -105,7 +105,7 @@ Lastly, hit **Write** at the bottom of the patitions list to *write the changes*
 
 **Let’s see the new partition list**
 
-```
+```bash
 $ lsblk
 ```
 
@@ -127,29 +127,29 @@ You should see something like this:
 
 **Format the boot partition as FAT32**  
 
-```
+```bash
 $ mkfs.fat -F32 /dev/sda1
 ```  
 
 **Enable the swap partition**  
 
-```
+```bash
 $ mkswap /dev/sda2  
 $ swapon /dev/sda2
 ```  
 
 **Format home and root partition as ext4**  
 
-```
+```bash
 $ mkfs.ext4 /dev/sda3  
 $ mkfs.ext4 /dev/sda4
 ```  
 
 ### Connect to internet
 
-We need to make that sure we are connected to the internet to be able to install Arch Linux `base` and `linux` packages. Let’s see the names of our interfaces.
+We need to make sure that we are connected to the internet to be able to install Arch Linux `base` and `linux` packages. Let’s see the names of our interfaces.
 
-```
+```bash
 $ ip link
 ```
 
@@ -163,7 +163,6 @@ You should see something like this:
 		link/ether 00:00:00:00:00:00 brd ff:ff:ff:ff:ff:ff permaddr 00:00:00:00:00:00
 ```
 
-**Where:**  
 **`enp0s30`** is the wired interface  
 **`wlp7s0`** is the wireless interface  
 
@@ -200,36 +199,35 @@ Mount the **`root`** partition:
 $ mount /dev/sda3 /mnt
 ```  
 
-**If `/mnt` doesn't exist create it.**
+**If `/mnt` directory doesn't exist create it.**
 
-```
+```bash
 $ mkdir /mnt
 ```  
 
-Mount the **`boot`** partition  
+Create and mount the **`boot`** partition  
 
-```
+```bash
 $ mkdir /mnt/boot  
 $ mount /dev/sda1 /mnt/boot
 ```  
 
-Mount the **`home`** partion  
+Create and mount the **`home`** partion  
 
-```
+```bash
 $ mkdir /mnt/home
 $ mount /dev/sda4 /mnt/home
 ``` 
 
-We don’t need to mount **swap** since it is already enabled.  
+We don’t need to mount **`swap`** since it is already enabled.  
 
 ### Installing the base and linux packages
 
-Now let’s go ahead and install **`base`**, **`linux`** and **`base-devel`** packages into our system. The kernel is not included in the base group including other application like editors. Even the lovely *nano* doesn't survived the snap.  
-
+Now let’s go ahead and install **`base`**, **`linux`** and **`base-devel`** packages into our system. The kernel is not included in the base group including other application like editors. Even the lovely **`nano`** doesn't survived the snap.  
 So let's also install the packages detached from the base group.  
 
-```
-$ pacstrap /mnt base linux linux-firmware base-devel less logrotate man-db man-pages which dhcpcd inetutils jfsutils mdadm perl reiserfsprogs sysfsutils systemd-sysvcompat texinfo usbutils xfsprogs s-nail netctl nano iputils
+```bash
+$ pacstrap /mnt base linux linux-firmware base-devel less logrotate man-db man-pages which dhcpcd netctl inetutils jfsutils mdadm perl reiserfsprogs sysfsutils systemd-sysvcompat texinfo usbutils xfsprogs s-nail nano iputils
 ```
 
 It's your decision if you want to all install the packages.
@@ -239,7 +237,7 @@ Just hit enter/yes for all the prompts that come up. Wait for Arch to finish ins
 
 ### Generating the fstab
 
-```
+```bash
 $ genfstab -U /mnt >> /mnt/etc/fstab
 ```  
 
@@ -248,7 +246,7 @@ $ genfstab -U /mnt >> /mnt/etc/fstab
 
 Now, chroot to the newly installed system  
 
-```
+```bash
 $ arch-chroot /mnt /bin/bash
 ```
 
@@ -256,12 +254,13 @@ $ arch-chroot /mnt /bin/bash
 
 A selection of timezones can be found under `/usr/share/zoneinfo/`. Since I am in the Philippines, I will be using `/usr/share/zoneinfo/Asia/Manila`. Select the appropriate timezone for your country:  
 
-```
+```bash
 $ ln -s /usr/share/zoneinfo/Asia/Manila /etc/localtime
 ```
 
-Run hwclock to generate `/etc/adjtime`:  
-```
+Run hwclock to generate `/etc/adjtime`: 
+
+```bash
 $ hwclock --systohc
 ```
 
@@ -270,19 +269,20 @@ $ hwclock --systohc
 The Locale defines which language the system uses, and other regional considerations such as currency denomination, numerology, and character sets. Possible values are listed in `/etc/locale.gen`. Uncomment `en_US.UTF-8`, as well as other needed localisations.
 
 **Uncomment** `en_US.UTF-8 UTF-8` and other needed locales in `/etc/locale.gen`, **save**, and generate them with:  
-```
+
+```bash
 $ locale-gen
 ```
 
 Create the locale.conf file, and set the LANG variable accordingly:  
 
-```
+```bash
 $ echo 'LANG=en_US.UTF-8' > /etc/locale.conf
 ```
 
 If you set the keyboard layout, make the changes persistent in vconsole.conf:  
 
-```
+```bash
 echo 'KEYMAP=us' > /etc/vconsole.conf
 ```
 
@@ -291,19 +291,19 @@ echo 'KEYMAP=us' > /etc/vconsole.conf
 
 Create the hostname file:  
 
-```
+```bash
 $ echo 'MYHOSTNAME' > /etc/hostname
 ```
 
 Open/Create hosts file to add matching entries to hosts:  
 
-```
+```bash
 nano /etc/hosts
 ```  
 
 Add this:  
 
-```
+```bash
 127.0.0.1    localhost  
 ::1          localhost  
 127.0.1.1    MYHOSTNAME.localdomain	  MYHOSTNAME  
@@ -313,6 +313,7 @@ Add this:
 If the system has a permanent IP address, it should be used instead of 127.0.1.1.
 
 ### Initramfs  
+
 Creating a new initramfs is usually not required, because mkinitcpio was run on installation of the kernel package with pacstrap.
 For LVM, system encryption or RAID, modify mkinitcpio.conf and recreate the initramfs image:  
 
@@ -321,6 +322,7 @@ $ mkinitcpio -p linux
 ```
 
 ### Wireless Connections
+
 For wireless connections, install iw, wpa_supplicant, and (for wifi-menu) dialog. This is needed if you want to use a wi-fi connection after the next reboot!
 
 ```
@@ -328,16 +330,20 @@ $ pacman -S iw wpa_supplicant dialog
 ```
 
 ### Adding Repositories
+
 Enable multilib and AUR repositories in `/etc/pacman.conf:`  
-```
+
+```bash
 $ nano /etc/pacman.conf
 ```
 
 Uncomment multilib (remove # from the beginning of the lines):  
+
 ```
 [multilib]
 Include = /etc/pacman.d/mirrorlist
 ```
+
 Add the following lines at the end of `/etc/pacman.conf` to enable AUR repo:  
 
 ```
@@ -350,7 +356,7 @@ Server = http://repo.archlinux.fr/$arch
 
 While you're at it, **you can add colors and PAC-MAN in pacman!**
 
-Open `/etc/pacman.conf`, then find `# Misc options` string then **below** that add:
+Open `/etc/pacman.conf`, then find `# Misc options`. After that, **below** that, add:
 
 ```
 Color
@@ -361,19 +367,19 @@ ILoveCandy
 
 Set the root password:  
 
-```
+```bash
 $ passwd
 ```
 
 Add a new user with username *MYUSERNAME*:  
 
-```
+```bash
 $ useradd -m -g users -G wheel,storage,power,video,audio,rfkill -s /bin/bash MYUSERNAME
 ```  
 
 Set password the password for user MYUSERNAME:  
 
-```
+```bash
 $ passwd MYUSERNAME
 ```
 
@@ -382,31 +388,33 @@ $ passwd MYUSERNAME
 
 If you want a root power by using the command `sudo`, you should grant your self with that power.
 
-```
+```bash
 $ EDITOR=nano visudo
 ```
 
-Uncomment the line
-```
+Uncomment the line (Remove #):
+
+```bash
 # %wheel ALL=(ALL) ALL
 ```
 
 ### Install the boot loader:  
 
-Yeah, this is wher we install the bootloader. No need for `grub2`.
-```
+Yeah, this is where we install the bootloader. We'll be using **`systemd-boot`**, so no need for `grub2`.
+
+```bash
 $ bootctl install
 ```
 
 Create a boot entry:  
 
-```
+```bash
 $ nano /boot/loader/entries/arch.conf
 ```
 
 Add these lines:
 
-```
+```bash
 title Arch Linux  
 linux /vmlinuz-linux  
 initrd  /initramfs-linux.img  
@@ -416,7 +424,8 @@ options root=/dev/sda3 rw
 Save and exit.
 
 ### Exit chroot and reboot:  
-```
+
+```bash
 $ exit
 $ reboot
 ```
@@ -442,9 +451,12 @@ After installing the graphical server, we need to install the video drivers. I'm
 $ sudo pacman -S xf86-video-intel vulkan-intel vulkan-intel lib32-vulkan-intel vulkan-icd-loader lib32-vulkan-icd-loader lib32-mesa
 ```
 
-Add your (kernel) graphics driver to your initramfs. For example, if using intel: 
+Add your (kernel) graphics driver to your initramfs. For example, if using intel add **`i915`**: 
 
 ```bash
+# We will use sudoedit to edit text files with higher privileges
+# This will not work(probably) if you don't set your $EDITOR
+# You can also use `sudo nano` for simplicity's sake
 $ sudoedit /etc/mkinitcpio.conf
 ```
 
@@ -463,7 +475,10 @@ $ sudo pacman -S alsa-utils pulseaudio-alsa pulseaudio-bluetooth pulseaudio pavu
 #### Install file system tools and file manager
 
 ```bash
-$ sudo pacman -S unrar unzip p7zip gvfs-mtp libmtp ntfs-3g android-udev ffmpegthumbnailer mtpfs dolphin ranger
+# File system tools
+$ sudo pacman -S unrar unzip p7zip gvfs-mtp libmtp ntfs-3g android-udev ffmpegthumbnailer mtpfs 
+# File managers
+$ sudo pacman -S dolphin ranger
 ```
 
 #### Install GUI and CLI web browser
@@ -480,10 +495,10 @@ Of course, we need a terminal emulator
 $ sudo pacman -S kitty xterm
 ```
 
-#### Install GIT
+#### Install git
 
 ```bash
-$ sudo pacman -S git go
+$ sudo pacman -S git
 ```
 
 #### Install an AUR helper
@@ -502,7 +517,7 @@ $ makepkg -sri
 
 #### GUI Environment
 
-Install your desktop environment or window manager. I'm using `awesomewm`.
+Install your desktop environment or window manager. I'm using a window manager and it is `awesomewm`.
 
 ```bash
 $ yay -S awesome-git --noconfirm --removemake
@@ -535,7 +550,7 @@ $ yay -S plymouth-git
 $ yay -S gdm-plymouth
 ```
 
-Add plymouth to the HOOKS array in mkinitcpio.conf. It must be added after base and udev for it to work: 
+Add `plymouth` to the HOOKS array in mkinitcpio.conf. It must be added after base and udev for it to work: 
 
 ```bash
 $ sudoedit /etc/mkinitcpio.conf
@@ -556,7 +571,7 @@ $ sudo plymouth-set-default-theme -l
 $ sudo plymouth-set-default-theme -R theme_name
 ```
 
-You now need to append the `quiet splash loglevel=3 rd.udev.log_priority=3 vt.global_cursor_default=0` kernel parameters. See [Silent Boot](#silent-boot).
+You now need to append `splash` in the kernel parameters. See [Silent Boot](#silent-boot).
 
 #### Install missing kernel modules.
 
@@ -567,7 +582,7 @@ $ sudo mkinitcpio -p linux
 
 #### Silent boot
 
-This is for who prefer to limit the verbosity of their system to a strict minimum, either for aesthetics or other reasons. 
+This is for who prefer to limit the verbosity of their system to a strict minimum, either for aesthetics or other reasons. For me, it's aesthetics. 
 
 Edit boot loader kernel parameters:
 
@@ -620,7 +635,7 @@ There's a ton of display manager out there. I'm using sddm so this guide will co
 $ sudo pacman -S sddm
 ```
 
-To enable graphical login, enable the appropriate systemd service. For example, for SDDM, enable `sddm.service`.  In this case we will enable `sddm-plymouth.service` just because we're using plymouth.
+To enable graphical login, enable the appropriate systemd service. For example, for SDDM, enable `sddm.service`. Just because we're using plymouth, we will enable `sddm-plymouth.service` to have a plymouth support.
 
 Install a theme. I'm using the `Sugar Candy` theme.
 
@@ -699,12 +714,13 @@ ethernet.cloned-mac-address=random
 wifi.cloned-mac-address=stable
 ```
 
-## To be continued ...
+
+#### Font Installation
 
 
-#### Better Font Rendering
+#### Improve Font Rendering
 
-Make your system's fonts beautiful great again! Improve your fonts for system-wide usage without installing a patched font library packages like the `Infinality`.
+Make your system fonts great again! Improve your fonts for system-wide usage without installing a patched font library packages like the `Infinality`.
 
 Install these fonts, for example:
 
@@ -716,9 +732,10 @@ Enable font presets by creating symbolic links:
 
 ```bash
 $ sudo ln -s /etc/fonts/conf.avail/70-no-bitmaps.conf /etc/fonts/conf.d
-$	sudo ln -s /etc/fonts/conf.avail/10-sub-pixel-rgb.conf /etc/fonts/conf.d
-$	sudo ln -s /etc/fonts/conf.avail/11-lcdfilter-default.conf /etc/fonts/conf.d
+$ sudo ln -s /etc/fonts/conf.avail/10-sub-pixel-rgb.conf /etc/fonts/conf.d
+$ sudo ln -s /etc/fonts/conf.avail/11-lcdfilter-default.conf /etc/fonts/conf.d
 ```
+
 The above will disable embedded bitmap for all fonts, enable sub-pixel RGB rendering, and enable the LCD filter which is designed to reduce colour fringing when subpixel rendering is used.
 
 For font consistency, all applications should be set to use the serif, sans-serif, and monospace aliases, which are mapped to particular fonts by fontconfig.
@@ -754,7 +771,8 @@ Create `/etc/fonts/local.conf`, then add:
 					<string>monospace</string>
 				</test>
 				<edit name="family" mode="assign" binding="same">
-						<string>Noto Mono</string></edit>
+						<string>Noto Mono</string>
+				</edit>
 		</match>
 </fontconfig>
 ```
@@ -835,13 +853,6 @@ ffmpeg
 | gimp |
 | inkscape |
 
-# Aur helper
-Install `yay`, a *Yet another yogurt. Pacman wrapper and AUR helper written in go.*
-```
-git clone https://aur.archlinux.org/yay.git
-cd yay
-makepkg -sri
-```
 
 | more aur apps |
 | --- |
