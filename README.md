@@ -498,7 +498,7 @@ GTK, or the GIMP Toolkit, is a multi-platform toolkit for creating graphical use
 # File system tools
 $ sudo pacman -S unrar unzip p7zip gvfs-mtp libmtp ntfs-3g android-udev ffmpegthumbnailer mtpfs xdg-user-dirs
 # File managers
-$ sudo pacman -S dolphin ranger
+$ sudo pacman -S dolphin kde-cli-tools ranger
 ```
 
 `xdg-user-dirs` is a tool to help manage "well known" user directories like the desktop folder and the music folder so generate XDG user directories by:
@@ -1244,67 +1244,46 @@ Notable changes after installing `gtk3-mushrooms`:
 
 So the real question is why did the `GNOME` team keeps removing the best features and adding things nobody ask for? Just kidding!
 
+#### We're done ricing!
 
-| Network tools |
-| --- |
-| aircrack-ng |
+### Install daily applications
 
-| terminal eyecandies |
-| --- |
-| neofetch |
+#### Media
 
-| tools |
-| --- |
-| imagemagick |
-| dconf-editor |
-| maim |
-| mupdf |
-| redshift |
-| arandr |
+**`vlc`** as video player
+**`mpd`** as music server
+**`mpc`** as minimalist command line interface to `mpd`
+**`ncmpcpp`** as fully featured `mpd` client using ncurses
+**`feh`** as image viewer
+**`perl-image-exiftool`** as reader and rewriter of EXIF informations that supports raw files
+**`simplescreenrecorder`** as screen recorder
 
+#### Network tools
 
-| vbox |
-| --- |
-| virtualbox |
-| virtualbox-host-modules-arch |
-| virtualbox-guest-iso |
-| linux-headers |
-| virtualbox-ext-oracle |
+**`aircrack-ng`** as deauth program
+**`fluxion`** as  MiTM program
 
-| media |
-| --- |
-| vlc |
-| mpd |
-ffmpeg
-| mpc |
-| ncmpcpp |
-| perl-image-exiftool |
-| feh |
-| simplescreenrecorder |
+#### Terminal eyecandies
 
+**`neofetch`** as a CLI system information tool
+**`cava`** as audio visualizer
+**`pipes.sh`** as animated pipes terminal screensaver
+**`cmatrix`** as matrix-like terminal screensaver
 
-| Media editors |
-| --- |
-| gimp |
-| inkscape |
+#### Media Editors
 
+**`gimp`** as image manipulation program
+**`inkscape`** as vector graphics editor
+**`ffmpeg`** as video converter
+**`imagemagick`** as image viewing/manipulation program
 
-| more aur apps |
-| --- |
-| picom-tryone-git |
-| cava-git |
-| awesome-git |
-| mugshot |
-| flat-remix |
-| flat-remix-gtk |
-| pamac-aur |
-| gtk3-nocsd-git |
-| gtk3-mushrooms |
-| rxvt-unicode-pixbuf |
-| rofi-git |
-| glxinfo |
-| toilet |
-| korla-icon-theme-git |
-| pkhex-bin |
-| oomox-git |
-| ttf-vista-fonts |
+#### Basic tools
+
+**`maim`** as screenshot tool
+**`mupdf`** as pdf viewer
+**`redshift`** as the blue light filter
+**`arandr`** as xrandr's face
+**`mugshot`** as personal user details updater
+**`pamac-aur`** as frontend for libalpm
+**`toilet`** as ascii generator tool
+**`dconf-editor`** as dconf editor
