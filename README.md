@@ -435,6 +435,8 @@ $ reboot
 
 ## POST INSTALLATION
 
+In post installation we will be using a lot of `sudo`. I'm not responsible if you broke your newly installed system. Remember that this guide is *for* **future me**.
+
 #### Install X server
 
 After booting up, you will be greeted by TTY. Still, there's no sign of GUI everywhere. So we need to install it. But before that, we need an internet connection! Follow this [guide](#connect-to-internet). Make sure to open the guide in a new tab, otherwise this page will scroll up instead and I think you don't want that.
@@ -478,9 +480,15 @@ $ sudo pacman -S alsa-utils pulseaudio-alsa pulseaudio-bluetooth pulseaudio pavu
 
 ```bash
 # File system tools
-$ sudo pacman -S unrar unzip p7zip gvfs-mtp libmtp ntfs-3g android-udev ffmpegthumbnailer mtpfs 
+$ sudo pacman -S unrar unzip p7zip gvfs-mtp libmtp ntfs-3g android-udev ffmpegthumbnailer mtpfs xdg-user-dirs
 # File managers
 $ sudo pacman -S dolphin ranger
+```
+
+`xdg-user-dirs` is a tool to help manage "well known" user directories like the desktop folder and the music folder so generate XDG user directories by:
+
+```bash
+$ xdg-user-dirs-update
 ```
 
 #### Install GUI and CLI web browser
@@ -498,6 +506,8 @@ $ sudo pacman -S kitty xterm
 ```
 
 #### Install git
+
+Git is the version control system (VCS) designed and developed by Linus Torvalds, the creator of the Linux kernel. Git is now used to maintain AUR packages, as well as many other projects, including sources for the Linux kernel. 
 
 ```bash
 $ sudo pacman -S git
@@ -517,12 +527,42 @@ $ cd yay
 $ makepkg -sri
 ```
 
+#### Backlight Control
+
+We'll use `light` for this because this is a better version of `xorg-xbacklight`.
+
+```bash
+$ yay -S light-git
+```
+
+#### Text Editors
+
+Install an editor.
+
+```bash
+# Editor for CLI
+$ sudo pacman -S vim
+# EDITOR for GUI
+$ yay -S sublime-text-dev
+```
+
 #### GUI Environment
 
-Install your desktop environment or window manager. I'm using a window manager and it is `awesomewm`.
+Install your desktop environment or window manager. 
+
+I'm using a window manager and it is `awesomewm`.
 
 ```bash
 $ yay -S awesome-git --noconfirm --removemake
+```
+
+If I will be using a desktop environment, it will be KDE Plasma.
+
+Install the `plasma-meta` meta-package or the `plasma` group. For differences between `plasma-meta` and `plasma` reference Package group. Alternatively, for a more minimal Plasma installation, install the `plasma-desktop` package.
+
+```bash
+# Let's start with a minimal Plasma enviroment
+$ sudo pacman -S plasma-desktop
 ```
 
 #### Install a compositor
@@ -545,35 +585,37 @@ $ yay -S rofi-git --noconfirm --removemake
 
 Plymouth provides a flicker-free graphical boot process.
 
-```bash
-# Install
-$ yay -S plymouth-git
-# If you also use GDM, you should install the gdm-plymouth, which compiles gdm with plymouth support. 
-$ yay -S gdm-plymouth
-```
+1. Install plymouth.
 
-Add `plymouth` to the HOOKS array in mkinitcpio.conf. It must be added after base and udev for it to work: 
+	```bash
+	# Install
+	$ yay -S plymouth-git
+	# If you also use GDM, you should install the gdm-plymouth, which compiles gdm with plymouth support. 
+	$ yay -S gdm-plymouth
+	```
 
-```bash
-$ sudoedit /etc/mkinitcpio.conf
-```
+2. Add `plymouth` to the HOOKS array in mkinitcpio.conf. It must be added after base and udev for it to work: 
 
-Put `plymouth` after base and udev:
+	```bash
+	$ sudoedit /etc/mkinitcpio.conf
+	```
 
-```
-HOOKS=(base udev plymouth ...)
-```
+	Put `plymouth` after base and udev:
 
-Set the theme.
+	```
+	HOOKS=(base udev plymouth ...)
+	```
 
-```bash
-# List all the installed plymouth theme
-$ sudo plymouth-set-default-theme -l
-# Select a theme then rebuild  initrd
-$ sudo plymouth-set-default-theme -R theme_name
-```
+3. Set the theme.
 
-You now need to append `splash` in the kernel parameters. See [Silent Boot](#silent-boot).
+	```bash
+	# List all the installed plymouth theme
+	$ sudo plymouth-set-default-theme -l
+	# Select a theme then rebuild  initrd
+	$ sudo plymouth-set-default-theme -R theme_name
+	```
+
+4. You now need to append `splash` in the kernel parameters. See [Silent Boot](#silent-boot).
 
 #### Install missing kernel modules.
 
@@ -586,70 +628,79 @@ $ sudo mkinitcpio -p linux
 
 This is for who prefer to limit the verbosity of their system to a strict minimum, either for aesthetics or other reasons. For me, it's aesthetics. 
 
-Edit boot loader kernel parameters:
+1. Edit boot loader kernel parameters:
 
-```bash
-$ sudoedit /boot/loader/entries/arch.conf
-```
+	```bash
+	$ sudoedit /boot/loader/entries/arch.conf
+	```
 
-Add these lines at the bottom of the file then save:
+2. Add these parameters `(options ... loglevel=3 vga=current rd.udev.log_priority=3 ...)` in the `options`:
 
-```
-options quiet splash loglevel=3 vga=current rd.udev.log_priority=3
-```
+	```
+	options quiet splash loglevel=3 vga=current rd.udev.log_priority=3
+	```
 
 #### Microcode
 
 Processor manufacturers release stability and security updates to the processor microcode. These updates provide bug fixes that can be critical to the stability of your system. Without them, you may experience spurious crashes or unexpected system halts that can be difficult to track down. 
 
-```bash
-# For AMD processors
-$ sudo pacman -S amd-ucode
-# For intel processors
-$ sudo pacman -S intel-ucode
-```
+1. Install microcode.
 
-If your Arch installation is on a removable drive that needs to have microcode for both manufacturer processors, install both packages. 
+	```bash
+	# For AMD processors
+	$ sudo pacman -S amd-ucode
+	# For intel processors
+	$ sudo pacman -S intel-ucode
+	```
 
-Load  microcode. For systemd-boot, use the `initrd` option to load the microcode, before the initial ramdisk, as follows:
+	If your Arch installation is on a removable drive that needs to have microcode for both manufacturer processors, install both packages. 
 
-```bash
-$ sudoedit /boot/loader/entries/entry.conf
-```
 
-```
-title   Arch Linux
-linux   /vmlinuz-linux
-initrd  /cpu_manufacturer-ucode.img
-initrd  /initramfs-linux.img
-...
-```
+2. Load  microcode. For systemd-boot, use the `initrd` option to load the microcode, before the initial ramdisk, as follows:
 
-Change `cpu_manufacturer-ucode` with either `amd` or `intel` depending on your processor.
+	```bash
+	$ sudoedit /boot/loader/entries/entry.conf
+	```
+
+	```
+	title   Arch Linux
+	linux   /vmlinuz-linux
+	initrd  /cpu_manufacturer-ucode.img
+	initrd  /initramfs-linux.img
+	...
+	```
+
+	Change `cpu_manufacturer-ucode` with either `amd` or `intel` depending on your processor.
 
 #### Display Manager
 
 A display manager, or login manager, is typically a graphical user interface that is displayed at the end of the boot process in place of the default shell.
 
-There's a ton of display manager out there. I'm using `sddm` so this guide will cover that. First, install it:
+There's a ton of display manager out there. I'm using `sddm` so this guide will cover that. 
 
-```bash
-$ sudo pacman -S sddm
-```
+1. First, install it:
 
-To enable graphical login, enable the appropriate systemd service. For example, for SDDM, enable `sddm.service`. Just because we're using plymouth, we will enable `sddm-plymouth.service` to have a plymouth support.
+	```bash
+	$ sudo pacman -S sddm
+	```
 
-Install a theme. I'm using the `Sugar Candy` theme.
+2. To enable graphical login, enable the appropriate systemd service. For example, for SDDM, enable `sddm.service`. Just because we're using plymouth, we will enable `sddm-plymouth.service` to have a plymouth support.
 
-```bash
-$ yay -S sddm-theme-sugar-candy-git
-```
+	```bash
+	$ sudo systemctl enable sddm-plymouth
+	```
 
-Configure the theme by:
+3. Install a theme. I'm using the `Sugar Candy` theme.
 
-```bash
-$ sudoedit /usr/share/sddm/themes/Sugar-Candy/theme.conf
-```
+	```bash
+	$ yay -S sddm-theme-sugar-candy-git
+	```
+
+4. Configure the theme by:
+
+	```bash
+	$ sudoedit /usr/share/sddm/themes/Sugar-Candy/theme.conf
+	```
 
 #### Reboot then Login
 
@@ -663,153 +714,403 @@ $ reboot
 
 As of now, we're using `netctl` if we're using wireless connection and `dhcpcd` if we're on wired connection. So it's time to install a GUI to connect to the internet.
 
-```bash
-$ sudo pacman -S networkmanager network-manager-applet dhclient modemmanager usb_modeswitch mobile-broadband-provider-info
-```
+1. Install network manager and its utilities.
 
-Disable netctl or dhcpcd.
+	```bash
+	$ sudo pacman -S networkmanager network-manager-applet dhclient modemmanager usb_modeswitch mobile-broadband-provider-info
+	```
 
-```bash
-# If using netctl
-# Stop current connection
-$ sudo netctl stop profile_name
-$ sudo netctl disable profile_name
-$ sudo systemctl stop netctl
-$ sudo systemctl disable netctl
+2. Disable netctl or dhcpcd.
 
-# If using dhcpcd
-$ sudo systemctl stop dhcpcd
-$ sudo systemctl disable dhcpcd
-```
+	```bash
+	# If using netctl
+	# Stop current connection
+	$ sudo netctl stop profile_name
+	$ sudo netctl disable profile_name
+	$ sudo systemctl stop netctl
+	$ sudo systemctl disable netctl
 
-Enable Network Manager service.
+	# If using dhcpcd
+	$ sudo systemctl stop dhcpcd
+	$ sudo systemctl disable dhcpcd
+	```
 
-```bash
-# If using dhcpcd
-$ sudo systemctl enable NetworkManger
-$ sudo systemctl start NetworkManger
-```
+3. Enable Network Manager service.
 
-Sometimes you have to reboot if you cannot connect using the NetworkManger.
+	```bash
+	# If using dhcpcd
+	$ sudo systemctl enable NetworkManger
+	$ sudo systemctl start NetworkManger
+	```
+
+	Sometimes you have to `reboot` if you cannot connect using the NetworkManger.
 
 Optional:
 
 Run `network-manager-applet` to have the network manager applet in you system tray. 
 
-Enable MAC randomization. MAC randomization can be used for increased privacy by not disclosing your real MAC address to the network. 
+#### Enable MAC randomization
 
-Install macchanger.
+MAC randomization can be used for increased privacy by not disclosing your real MAC address to the network. 
+
+1. Install macchanger.
+
+	```bash
+	$ sudo pacman -S macchanger
+	```
+
+2. Create `30-mac-randomization.conf` in your `/etc/NetworkManager/conf.d/`. Add this:
+
+	```
+	[device-mac-randomization]
+	# "yes" is already the default for scanning
+	wifi.scan-rand-mac-address=yes
+
+	[connection-mac-randomization]
+	ethernet.cloned-mac-address=random
+	wifi.cloned-mac-address=stable
+	```
+
+#### Bluetooth Connection
+
+
+1. Install the `bluez` package, providing the Bluetooth protocol stack.
+2. Install the `bluez-utils` package, providing the `bluetoothctl` utility
+3. The generic Bluetooth driver is the `btusb` Kernel module. Check whether that module is loaded. If it's not, then [load the module](https://wiki.archlinux.org/index.php/Kernel_module#Manual_module_handling).
+4. Start/enable `bluetooth.service`.
 
 ```bash
-$ sudo pacman -S macchanger
+# Install
+$ sudo pacman -S bluez bluez-utils
+# Start/Enable
+$ sudo systemctl enable bluetooth.service
 ```
 
-Create `30-mac-randomization.conf` in your `/etc/NetworkManager/conf.d/`. Add this:
+#### Bluetooth GUI
 
+We'll use `blueman` for this. Blueman is a full featured Bluetooth manager written in GTK.
+
+1. Install blueman.
+
+	```bash
+	$ sudo pacman -S blueman
+	```
+
+	Be sure to enable the Bluetooth daemon and start Blueman with `blueman-applet`. A graphical settings panel can be launched with `blueman-manager`.
+
+2. Disable auto-power-on 
+
+	Blueman automatically enables Bluetooth adapter () when certain events (on boot, laptop lid is opened, ...) occur. This can be disabled with the `auto-power-on` in org.blueman.plugins.powermanager: 
+
+	```bash
+	$ gsettings set org.blueman.plugins.powermanager auto-power-on false
+	```
+
+#### Better Power Management
+
+1. Install and start/enable `TLP`:
+
+	```bash
+	$ sudo pacman -S tlp
+	$ sudo systemctl enable tlp.service
+	```
+
+2. Install `acpid` and `acpi_call`:
+
+	```bash
+	# Install
+	$ sudo pacman -S acpid acpi_call
+	# Enable acpid
+	$ sudo systemctl enable acpid.service
+	```
+
+#### Better Fan Control for Thinkpad
+
+1. We'll use/install `thinkfan` here.
+
+	```bash
+	$ yay -S thinkfan
+	```
+
+	Note that the thinkfan package installs `/usr/lib/modprobe.d/thinkpad_acpi.conf`, which contains:
+
+	```
+	options thinkpad_acpi fan_control=1
+	```
+
+	So fan control is enabled by default. Alternatively, you can enable fan control as follows: 
+
+	```bash
+	$ echo "options thinkpad_acpi fan_control=1" > /etc/modprobe.d/thinkfan.conf
+	```
+
+2. Now, load the module: 
+
+	```bash
+	$ sudo modprobe thinkpad_acpi
+	$ sudo cat /proc/acpi/ibm/fan
+	```
+
+	You should see that the fan level is "auto" by default, but you can echo a level command to the same file to control the fan speed manually. The thinkfan daemon will do this automatically.
+
+3. Open `/etc/thinkfan.conf`. Then use the following configuration: 
+
+	```
+	tp_fan /proc/acpi/ibm/fan
+	hwmon /sys/class/thermal/thermal_zone0/temp
+
+	(0, 0,  60)
+	(1, 53, 65)
+	(2, 55, 66)
+	(3, 57, 68)
+	(4, 61, 70)
+	(5, 64, 71)
+	(7, 68, 32767)
+	```
+
+4. Finally, enable the thinkfan systemd service: 
+
+	```bash
+	$ systemctl enable thinkfan.service
+	```
+
+#### Firewall
+
+We'll use `Uncomplicated Firewall` or `ufw` for short.
+
+1. Install the `ufw` package. Start and enable `ufw.service` to make it available at boot. Note that this will not work if `iptables.service` is also enabled (and same for its ipv6 counterpart). 
+
+	```bash
+	$ sudo pacman -S ufw
+	$ sudo systemctl start ufw.service
+	$ sudo systemctl enable ufw.service
+	```
+
+2. Configuration
+
+	Here's some basic configuration. A very simplistic configuration which will deny all by default, allow any protocol from inside a 192.168.0.1-192.168.0.255 LAN, and allow incoming Deluge and rate limited SSH traffic from anywhere: 
+
+	```bash
+	$ sudo ufw default deny
+	$ sudo ufw allow from 192.168.0.0/24
+	$ sudo ufw allow Deluge
+	$ sudo ufw limit ssh
+	```
+
+3. The next line is only needed once the first time you install the package: 
+
+	```bash
+	$ sudo ufw enable
+	```
+
+Adding other applications. The PKG comes with some defaults based on the default ports of many common daemons and programs. Inspect the options by looking in the `/etc/ufw/applications.d` directory or by listing them in the program itself: 
+
+```bash
+$ sudo ufw app list
 ```
-[device-mac-randomization]
-# "yes" is already the default for scanning
-wifi.scan-rand-mac-address=yes
 
-[connection-mac-randomization]
-ethernet.cloned-mac-address=random
-wifi.cloned-mac-address=stable
-```
+#### Real-Time Performance Monitoring Tool
 
+`netdata` will be the man for this job. `netdata` is a system for distributed real-time performance and health monitoring. netdata is created by the group that also created FireHOL and FireQOS. 
+
+1. Install and start/enable NetData
+
+	```bash
+	$ sudo pacman -S netdata
+	$ sudo systemctl start netdata
+	$ sudo systemctl enable netdata
+	```
+
+You can find all these settings, with their default values, by accessing the URL `http://localhost:19999/netdata.conf`.
+
+Access NetData via a Web browser by accessing <http://localhost:19999/netdata.conf>.
+
+#### And that's it! We covered all the must-have part! Now, it's time for basic ricing. :)
+
+Let's start with fonts!
 
 #### Font Installation
 
+Let's be honest, font rendering in Linux *is not that* good by default. So make them great again! Let's start with installing some beautiful fonts.
+
+```bash
+# Basic fonts
+$ sudo pacman -S ttf-dejavu ttf-liberation noto-fonts noto-fonts-emoji
+# macOS fonts. I just love macOS Fonts
+$ yay -S otf-san-francisco-pro otf-sfmono-patched 
+```
 
 #### Improve Font Rendering
 
 Make your system fonts great again! Improve your fonts for system-wide usage without installing a patched font library packages like the `Infinality`.
 
-Install these fonts, for example:
+1. If you haven't already, install these fonts:
 
-```bash
-$ sudo pacman -S ttf-dejavu ttf-liberation noto-fonts
-```
+	```bash
+	$ sudo pacman -S ttf-dejavu ttf-liberation noto-fonts
+	```
 
-Enable font presets by creating symbolic links:
+2. Enable font presets by creating symbolic links:
 
-```bash
-$ sudo ln -s /etc/fonts/conf.avail/70-no-bitmaps.conf /etc/fonts/conf.d
-$ sudo ln -s /etc/fonts/conf.avail/10-sub-pixel-rgb.conf /etc/fonts/conf.d
-$ sudo ln -s /etc/fonts/conf.avail/11-lcdfilter-default.conf /etc/fonts/conf.d
-```
+	```bash
+	$ sudo ln -s /etc/fonts/conf.avail/70-no-bitmaps.conf /etc/fonts/conf.d
+	$ sudo ln -s /etc/fonts/conf.avail/10-sub-pixel-rgb.conf /etc/fonts/conf.d
+	$ sudo ln -s /etc/fonts/conf.avail/11-lcdfilter-default.conf /etc/fonts/conf.d
+	```
 
-The above will disable embedded bitmap for all fonts, enable sub-pixel RGB rendering, and enable the LCD filter which is designed to reduce colour fringing when subpixel rendering is used.
+	The above will disable embedded bitmap for all fonts, enable sub-pixel RGB rendering, and enable the LCD filter which is designed to reduce colour fringing when subpixel rendering is used.
 
-For font consistency, all applications should be set to use the serif, sans-serif, and monospace aliases, which are mapped to particular fonts by fontconfig.
+	For font consistency, all applications should be set to use the serif, sans-serif, and monospace aliases, which are mapped to particular fonts by fontconfig.
 
-Create `/etc/fonts/local.conf`, then add:
+3. Create `/etc/fonts/local.conf`, then add:
 
-```xml
-<?xml version="1.0"?>
-<!DOCTYPE fontconfig SYSTEM "fonts.dtd">
-<fontconfig>
-		<match>
-				<edit mode="prepend" name="family">
-					<string>SF Pro Text</string>
-				</edit>
-		</match>
-		<match target="pattern">
-				<test qual="any" name="family">
-						<string>serif</string>
-				</test>
-				<edit name="family" mode="assign" binding="same">
-						<string>Noto Serif</string>
-				</edit>
-		</match>
-		<match target="pattern">
-				<test qual="any" name="family">
-					<string>sans-serif</string></test>
-				<edit name="family" mode="assign" binding="same">
-						<string>Noto Sans</string>
-				</edit>
-		</match>
-		<match target="pattern">
-				<test qual="any" name="family">
-					<string>monospace</string>
-				</test>
-				<edit name="family" mode="assign" binding="same">
-						<string>Noto Mono</string>
-				</edit>
-		</match>
-</fontconfig>
-```
+	```xml
+	<?xml version="1.0"?>
+	<!DOCTYPE fontconfig SYSTEM "fonts.dtd">
+	<fontconfig>
+			<match>
+					<edit mode="prepend" name="family">
+						<string>SF Pro Text</string>
+					</edit>
+			</match>
+			<match target="pattern">
+					<test qual="any" name="family">
+							<string>serif</string>
+					</test>
+					<edit name="family" mode="assign" binding="same">
+							<string>Noto Serif</string>
+					</edit>
+			</match>
+			<match target="pattern">
+					<test qual="any" name="family">
+						<string>sans-serif</string></test>
+					<edit name="family" mode="assign" binding="same">
+							<string>Noto Sans</string>
+					</edit>
+			</match>
+			<match target="pattern">
+					<test qual="any" name="family">
+						<string>monospace</string>
+					</test>
+					<edit name="family" mode="assign" binding="same">
+							<string>Noto Mono</string>
+					</edit>
+			</match>
+	</fontconfig>
+	```
 
-Set your font settings to match above in your DE system settings.
+4. Set your font settings to match above in your DE system settings.
+
+You can also follow this [guide](https://jichu4n.com/posts/how-to-set-default-fonts-and-font-aliases-on-linux/).
 
 
+#### Improve Terminal Experience
+
+Improve your terminal experience! Let's replace `bash` with `zsh`. `Zsh` is a powerful shell that operates as both an interactive shell and as a scripting language interpreter. 
+
+0. Before starting, we may want to see what shell is currently being used: 
+
+	```bash
+	$ echo $SHELL
+	```
+
+1. Not using ZSH? Then install the `zsh` package. For additional completion definitions, install the `zsh-completions` package as well. 
+
+	```bash
+	$ sudo pacman -S zsh zsh-completions
+	```
+
+2. Make sure that Zsh has been installed correctly by running the following in a terminal: 
+
+	```bash
+	$ zsh
+	```
+
+	You should now see *zsh-newuser-install*, which will walk you through some basic configuration. If you want to skip this, press <kbd>q</kbd>. If you did not see it, you can invoke it manually with: 
+
+	```bash
+	$ autoload -Uz zsh-newuser-install
+	$ zsh-newuser-install -f
+	```
+
+	**Note:**  
+	Make sure your terminal's size is at least 72×15 otherwise *zsh-newuser-install* will not run.
+
+3. Change your `$SHELL` from whatever you're using right now to `ZSH`.
+
+	```bash
+	# User
+	$ chsh -s $(which zsh)
+
+	# System-wide
+	$ sudo chsh -s $(which zsh)
+	```
+
+	It's better if you `reboot` your system.
+
+
+#### Install `oh-my-zsh`
+
+After rebooting, let's now improve the `zsh` prompt.
+
+1. Install `oh-my-zsh`:
+
+	```zsh
+	# via curl
+	$ sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+	# via wget
+	$ sh -c "$(wget https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh -O -)"
+	```
+
+	After this open a terminal then a guide will walk you through some basic configuration.
+
+#### Improve Terminal Prompt using PowerLevel10k
+
+1. Download the recommended font [here](https://github.com/romkatv/powerlevel10k#meslo-nerd-font-patched-for-powerlevel10k).
+
+
+2. Copy the downloaded font to the right font directory.
+
+	```zsh
+	# User only. If the folder doesn't exist, create it.
+	cp FONTNAME.TTF "${HOME}"/.local/share/fonts/TTF/
+
+	# System-wide
+	cp FONTNAME.TTF /usr/share/fonts/TTF/
+	```
+
+3. Rebuild font information cache files
+
+	```zsh
+	# User wide
+	$ fc-cache
+	# System-wide
+	$ sudo fc-cache
+	```
+
+4. Change your terminal font to `MesloLGS NF`.
+
+5. Install the `Powerlevel10k` theme.
+
+	```zsh
+	$ git clone --depth=1 https://github.com/romkatv/powerlevel10k.git $ZSH_CUSTOM/themes/powerlevel10k
+	```
+
+6. Open `~/.zshrc` with your editor
+
+	```zsh
+	$ $EDITOR $HOME/.zshrc
+	```
+
+	Find the line `ZSH_THEME=robbyrussell` it's not easy to miss. Then change it to `ZSH_THEME=powerlevel10k/powerlevel10k`.
+
+7. Open a terminal. There should be some instructions/dialog there that will greet you and will guide you to theme your Powerlevel10k prompt.
+
+More info about Powerlevel10k [here](https://github.com/romkatv/powerlevel10k)
 
 | Network tools |
 | --- |
 | aircrack-ng |
-
-| Maintenance |
-| --- |
-| tlp |
-| ufw |
-| netdata |
-| thinkfan |
-| acpid |
-| acpi_call |
-
-| Font |
-| --- |
-| noto-fonts-emoji |
-
-| Bluetooth |
-| --- |
-| bluez |
-| bluez-utils |
-| blueman |
-
-| Editors |
-| --- |
-| vim |
-| sub1ime-text |
 
 | terminal eyecandies |
 | --- |
