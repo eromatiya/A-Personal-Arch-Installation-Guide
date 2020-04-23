@@ -1,4 +1,3 @@
-
 # A PERSONAL Arch Installation Guide
 
 
