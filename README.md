@@ -9,6 +9,7 @@ Arch changed a lot of things in packaging like removing a lot of packages in bas
 I'm using GPT and systemd-boot in my installation. My system is `Lenovo X230`, so this guide will not cover the installation of proprietary drivers. **🖕, Nvidia** - Linus Torvalds.
 
 ### Set the keyboard layout
+
 The default console keymap is US. Available layouts can be listed with:
 
 ```bash
@@ -23,6 +24,7 @@ $ loadkeys us
 
 
 ### Update the system clock
+
 Use timedatectl to ensure the system clock is accurate:
 
 ```bash
@@ -30,80 +32,83 @@ $ timedatectl set-ntp true
 ```
 
 ### Disk Partitioning
-**Verify the boot mode**
+
+#### Verify the boot mode
+
 If UEFI mode is enabled on an UEFI motherboard, Archiso will boot Arch Linux accordingly via systemd-boot. To verify this, list the efivars directory:  
 
 ```bash
 $ ls /sys/firmware/efi/efivars
 ```
 
-**Check the drives**
+#### Check the drives
+
 The most common main drive is **sda**.
 
 ```bash
 $ lsblk
 ```
 
-**Let’s clean up our main drive to create new partitions for our installation**  
+#### Let’s clean up our main drive to create new partitions for our installation
 
 ```bash
 $ gdisk /dev/sda
 ```
 
-	Press <kbd>x</kbd> to enter **expert mode**. Then press <kbd>z</kbd> to *zap* our drive. Then hit <kbd>y</kbd> when prompted about wiping out GPT and blanking out MBR.  
+Press <kbd>x</kbd> to enter **expert mode**. Then press <kbd>z</kbd> to *zap* our drive. Then hit <kbd>y</kbd> when prompted about wiping out GPT and blanking out MBR.  
 	
 **NOTE:**  
-Remember that pressing <kbd>x</kbd> button will put you to *expert mode* and <kbd>z</kbd> will *zap* or wipe-out the drive. **Think carefully before pressing <kbd>Y</kbd> you can't undo this!**
+Remember that pressing <kbd>x</kbd> button will put you to *expert mode* and <kbd>z</kbd> will *zap* or wipe-out the drive. **Think carefully before pressing <kbd>Y</kbd>! This CAN'T be undone!**
 
-**Now let’s create our partitions**  
+#### Now let’s create our partitions
 
 ```bash
 $ cgdisk
 ```
+
 Enter the device filename of your main drive, e.g. `/dev/sda`. Just press <kbd>Return</kbd> when warned about damaged GPT.
 
 Now we should be presented with our main drive showing the partition number, partition size, partition type, and partition name. If you see list of partitions, delete all those first.
 
-**Let’s create our boot partition**  
+#### Let’s create our boot partition
 
-	 + Hit New from the options at the bottom.
-	 + Just hit enter to select the default option for the first sector.
-	 + Now the partion size - Arch wiki recommends 200-300 MB for the boot + size. Let’s make it 500MiB or 1GB in case we need to add more OS to our machine. I’m gonna assign mine with 1024MiB. Hit enter.
-	 + Set GUID to **EF00**. Hit enter.
-	 + Set name to boot. Hit enter.
-	 + Now you should see the new partition in the partitions list with a partition type of EFI System and a partition name of boot. You will also notice there is 1007KB above the created partition. That is the MBR. Don’t worry about that and just leave it there.
+	 +   Hit New from the options at the bottom.
+	 +   Just hit enter to select the default option for the first sector.
+	 +   Now the partion size - Arch wiki recommends 200-300 MB for the boot + size. Let’s make it 500MiB or 1GB in case we need to add more OS to our machine. I’m gonna assign mine with 1024MiB. Hit enter.
+	 +   Set GUID to **EF00**. Hit enter.
+	 +   Set name to boot. Hit enter.
+	 +   Now you should see the new partition in the partitions list with a partition type of EFI System and a partition name of boot. You will also notice there is 1007KB above the created partition. That is the MBR. Don’t worry about that and just leave it there.
 
-**Create the swap partition**
+#### Create the swap partition
 
-	 + Hit New again from the options at the bottom of partition list.
-	 + Just hit enter to select the default option for the first sector.
-	 + For the swap partition size, it is advisable to have 1.5 times the size of your RAM. I have 8GB of RAM so I’m gonna put 12GiB for the partition size. Hit enter.
-	 + Set GUID to **8200**. Hit enter.
-	 + Set name to swap. Hit enter.
+	 +   Hit New again from the options at the bottom of partition list.
+	 +   Just hit enter to select the default option for the first sector.
+	 +   For the swap partition size, it is advisable to have 1.5 times the size of your RAM. I have 8GB of RAM so I’m gonna put 12GiB for the partition size. Hit enter.
+	 +   Set GUID to **8200**. Hit enter.
+	 +   Set name to swap. Hit enter.
 
-**Create the root partition**
+#### Create the root partition
 
-	 + Hit New again.
-	 + Hit enter to select the default option for the first sector.
-	 + Hit enter again to input your root size.
-	 + Also hit enter for the GUID to select default.
-	 + Then set name of the partition to root.
+	 +   Hit New again.
+	 +   Hit enter to select the default option for the first sector.
+	 +   Hit enter again to input your root size.
+	 +   Also hit enter for the GUID to select default.
+	 +   Then set name of the partition to root.
 
 
-**Create the home partition**
+#### Create the home partition
 
-	 + Hit New again.
-	 + Hit enter to select the default option for the first sector.
-	 + Hit enter again to use the remainder of the disk.
-	 + Also hit enter for the GUID to select default.
-	 + Then set name of the partition to home.
+	 +   Hit New again.
+	 +   Hit enter to select the default option for the first sector.
+	 +   Hit enter again to use the remainder of the disk.
+	 +   Also hit enter for the GUID to select default.
+	 +   Then set name of the partition to home.
 
 Lastly, hit **Write** at the bottom of the patitions list to *write the changes* to the disk. Type `yes` to *confirm* the write command. Now we are done partitioning the disk. Hit **Quit** *to exit cgdisk*.
 
-
 ### FORMATTING PARTITIONS
 
-**Let’s see the new partition list**
+#### Let’s see the new partition list
 
 ```bash
 $ lsblk
@@ -125,20 +130,20 @@ You should see something like this:
 **`sda3`** is the home partition  
 **`sda4`** is the root partition  
 
-**Format the boot partition as FAT32**  
+#### Format the boot partition as FAT32
 
 ```bash
 $ mkfs.fat -F32 /dev/sda1
 ```  
 
-**Enable the swap partition**  
+#### Enable the swap partition
 
 ```bash
 $ mkswap /dev/sda2  
 $ swapon /dev/sda2
 ```  
 
-**Format home and root partition as ext4**  
+#### Format home and root partition as ext4
 
 ```bash
 $ mkfs.ext4 /dev/sda3  
@@ -168,21 +173,21 @@ You should see something like this:
 
 If you are on a wired connection, you can enable your wired interface by systemctl start dhcpcd@<interface>.  
 
-```
+```bash
 $ systemctl start dhcpcd@enp3s0
 ```
 
 If you are on a laptop, you can connect to a wireless access point using wifi-menu -o <wireless_interface>.
 
-```
+```bash
 $ systemctl enable netctl  
 $ wifi-menu wlp7s0
 ```  
 
 Ping google to make sure we are online:
 
-```
-$ ping -c 3 google.com
+```bash
+$ ping -c 3 8.8.8.8
 ``` 
 
 If you receive Unknown host or Destination host unreachable response, means you are not online yet. Review your network configuration and redo the steps above.
@@ -193,26 +198,26 @@ First we need to mount the partitions that we created earlier to their appropria
 
 ### Mounting partitions
 
-Mount the **`root`** partition:  
+#### Mount the `root` partition:  
 
-```
+```bash
 $ mount /dev/sda3 /mnt
 ```  
 
-**If `/mnt` directory doesn't exist create it.**
+If `/mnt` directory doesn't exist create it.**
 
 ```bash
 $ mkdir /mnt
 ```  
 
-Create and mount the **`boot`** partition  
+#### Create and mount the `boot` partition  
 
 ```bash
 $ mkdir /mnt/boot  
 $ mount /dev/sda1 /mnt/boot
 ```  
 
-Create and mount the **`home`** partion  
+#### Create and mount the `home` partion  
 
 ```bash
 $ mkdir /mnt/home
@@ -317,15 +322,15 @@ If the system has a permanent IP address, it should be used instead of 127.0.1.1
 Creating a new initramfs is usually not required, because mkinitcpio was run on installation of the kernel package with pacstrap.
 For LVM, system encryption or RAID, modify mkinitcpio.conf and recreate the initramfs image:  
 
-```
+```bash
 $ mkinitcpio -p linux
 ```
 
 ### Wireless Connections
 
-For wireless connections, install iw, wpa_supplicant, and (for wifi-menu) dialog. This is needed if you want to use a wi-fi connection after the next reboot!
+For wireless connections, install iw, wpa_supplicant, and (for wifi-menu) dialog. **This is needed if you want to use a wi-fi connection after the next reboot!**
 
-```
+```bash
 $ pacman -S iw wpa_supplicant dialog
 ```
 
@@ -352,7 +357,7 @@ SigLevel = Never
 Server = http://repo.archlinux.fr/$arch
 ```
 
-**Pacman Easter Eggs**
+**pacman Easter Eggs**
 
 While you're at it, **you can add colors and PAC-MAN in pacman!**
 
@@ -371,18 +376,17 @@ Set the root password:
 $ passwd
 ```
 
-Add a new user with username *MYUSERNAME*:  
+Add a new user with username *MYUSERNAME*. Of course, change *MYUSERNAME*, with your own:  
 
 ```bash
 $ useradd -m -g users -G wheel,storage,power,video,audio,rfkill -s /bin/bash MYUSERNAME
 ```  
 
-Set password the password for user MYUSERNAME:  
+Set password the password for user *MYUSERNAME*:  
 
 ```bash
 $ passwd MYUSERNAME
 ```
-
 
 ### Add the new user to sudoers:
 
@@ -429,7 +433,6 @@ Save and exit.
 $ exit
 $ reboot
 ```
-
 
 ## POST INSTALLATION
 
@@ -623,13 +626,13 @@ initrd  /initramfs-linux.img
 ...
 ```
 
-Change `cpu_manufacturer-ucode` with either `amd` or `intel` depending on your processors.
+Change `cpu_manufacturer-ucode` with either `amd` or `intel` depending on your processor.
 
 #### Display Manager
 
 A display manager, or login manager, is typically a graphical user interface that is displayed at the end of the boot process in place of the default shell.
 
-There's a ton of display manager out there. I'm using sddm so this guide will cover that. First, install it:
+There's a ton of display manager out there. I'm using `sddm` so this guide will cover that. First, install it:
 
 ```bash
 $ sudo pacman -S sddm
