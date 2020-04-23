@@ -799,6 +799,7 @@ MAC randomization can be used for increased privacy by not disclosing your real 
 # Install
 $ sudo pacman -S bluez bluez-utils
 # Start/Enable
+$ sudo systemctl start bluetooth.service
 $ sudo systemctl enable bluetooth.service
 ```
 
@@ -994,7 +995,7 @@ If we want to change our system font, GTK3, icon and cursor theme. We need a set
 	$ sudo pacman -S kvantum-qt5
 	```
 
-5. Install a kvantum theme. I recommend the [Inverse-dark](https://store.kde.org/p/1365482/) theme, because it's clean and modern looking. An edited version is in my [repo](https://github.com/manilarome/the-glorious-dotfiles/tree/master/config/Kvantum/Inverse-dark) and it's the one I've used in my screenshots above.
+5. Install a kvantum theme. I recommend the [Inverse-dark](https://store.kde.org/p/1365482/) theme, because it's clean and modern looking. An edited version is in my [dotfiles](https://github.com/manilarome/the-glorious-dotfiles/tree/master/config/Kvantum/Inverse-dark).
 
 6. Open `kvantummanager` to set your desired kvantum theme. You can configure the active theme to make some changes like making the dolphin view transparent, disable tooltip shadows, etc., etc.
 
@@ -1025,7 +1026,7 @@ A part of basic ricing is improving the icon theme.
 	Find `Inherits` then add `Papirus`.
 
 	```
-		Inherits=Papirus,Papirus-Dark,hicolor
+	Inherits=Papirus,Papirus-Dark,hicolor
 	```
 
 3. Set your theme in `lxappearance` and `qt5ct`.
