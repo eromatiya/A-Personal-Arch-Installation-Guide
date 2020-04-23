@@ -1250,40 +1250,40 @@ So the real question is why did the `GNOME` team keeps removing the best feature
 
 #### Media
 
-**`vlc`** as video player
-**`mpd`** as music server
-**`mpc`** as minimalist command line interface to `mpd`
-**`ncmpcpp`** as fully featured `mpd` client using ncurses
-**`feh`** as image viewer
-**`perl-image-exiftool`** as reader and rewriter of EXIF informations that supports raw files
-**`simplescreenrecorder`** as screen recorder
+**`vlc`** as video player  
+**`mpd`** as music server  
+**`mpc`** as minimalist command line interface to `mpd`  
+**`ncmpcpp`** as fully featured `mpd` client using ncurses  
+**`feh`** as image viewer  
+**`perl-image-exiftool`** as reader and rewriter of EXIF informations that supports raw files  
+**`simplescreenrecorder`** as screen recorder  
 
 #### Network tools
 
-**`aircrack-ng`** as deauth program
-**`fluxion`** as  MiTM program
+**`aircrack-ng`** as deauth program  
+**`fluxion`** as  MiTM program  
 
 #### Terminal eyecandies
 
-**`neofetch`** as a CLI system information tool
-**`cava`** as audio visualizer
-**`pipes.sh`** as animated pipes terminal screensaver
-**`cmatrix`** as matrix-like terminal screensaver
+**`neofetch`** as a CLI system information tool  
+**`cava`** as audio visualizer  
+**`pipes.sh`** as animated pipes terminal screensaver  
+**`cmatrix`** as matrix-like terminal screensaver  
 
 #### Media Editors
 
-**`gimp`** as image manipulation program
-**`inkscape`** as vector graphics editor
-**`ffmpeg`** as video converter
-**`imagemagick`** as image viewing/manipulation program
+**`gimp`** as image manipulation program  
+**`inkscape`** as vector graphics editor  
+**`ffmpeg`** as video converter  
+**`imagemagick`** as image viewing/manipulation program  
 
 #### Basic tools
 
-**`maim`** as screenshot tool
-**`mupdf`** as pdf viewer
-**`redshift`** as the blue light filter
-**`arandr`** as xrandr's face
-**`mugshot`** as personal user details updater
-**`pamac-aur`** as frontend for libalpm
-**`toilet`** as ascii generator tool
-**`dconf-editor`** as dconf editor
+**`maim`** as screenshot tool  
+**`mupdf`** as pdf viewer  
+**`redshift`** as the blue light filter  
+**`arandr`** as xrandr's face  
+**`mugshot`** as personal user details updater  
+**`pamac-aur`** as frontend for libalpm  
+**`toilet`** as ascii generator tool  
+**`dconf-editor`** as dconf editor  
