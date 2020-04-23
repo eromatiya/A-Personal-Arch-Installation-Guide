@@ -476,6 +476,22 @@ MODULES=(i915 ...)
 $ sudo pacman -S alsa-utils pulseaudio-alsa pulseaudio-bluetooth pulseaudio pavucontrol pulseeffects
 ```
 
+#### Install GTK3 and GTK2
+
+GTK, or the GIMP Toolkit, is a multi-platform toolkit for creating graphical user interfaces.
+
+1. Install GTK
+
+	```bash
+	$ sudo pacman -S gtk3 gtk2
+	```
+
+2. Install GTK engines
+
+	```bash
+	$ sudo pacman -S gtk-engine-murrine gtk-engines
+	```
+
 #### Install file system tools and file manager
 
 ```bash
@@ -550,13 +566,13 @@ $ yay -S sublime-text-dev
 
 Install your desktop environment or window manager. 
 
-I'm using a window manager and it is `awesomewm`.
+I'm using a window manager and it is `AwesomeWM`.
 
 ```bash
 $ yay -S awesome-git --noconfirm --removemake
 ```
 
-If I will be using a desktop environment, it will be KDE Plasma.
+If I will be using a desktop environment, it will be `KDE Plasma`.
 
 Install the `plasma-meta` meta-package or the `plasma` group. For differences between `plasma-meta` and `plasma` reference Package group. Alternatively, for a more minimal Plasma installation, install the `plasma-desktop` package.
 
@@ -925,13 +941,98 @@ You can find all these settings, with their default values, by accessing the URL
 
 Access NetData via a Web browser by accessing <http://localhost:19999/netdata.conf>.
 
+
 #### And that's it! We covered all the must-have part! Now, it's time for basic ricing. :)
 
-Let's start with fonts!
+### Basic Ricing
+
+My [setups](https://github.com/manilarome/the-glorious-dotfiles) are mostly transparent and blurred, that's why I mostly use Qt5 apps. Still, we have to use and rice GTK apps because not everything has an alternative Qt version.
+Let's start with installing some GTK and Qt system settings and and its themes.
+
+#### GTK3 Theming
+
+If we want to change our system font, GTK3, icon and cursor theme. We need a settings application. So we need to install that.
+
+1. Install `lxappearance-gtk3`.
+
+	```bash
+	$ sudo pacman -S lxappearance-gtk3
+	```
+
+2. After that we need to install a `GTK3` theme.
+	
+	I love dark theme so let's install a dark GTK3 theme.
+
+	```bash
+	# Material theme
+	$ sudo pacman -S material-gtk-theme
+	# Equilux theme
+	$ yay -S  equilux-theme
+	```
+
+3. Set your GTK3 theme in lxappearance.
+	
+	```bash
+	$ lxappearance
+	```
+
+#### Qt5 Theming
+
+1. Install `qt5ct` and `qt5-styleplugins`. We need these tools to [configure Qt5 apps under environments other than KDE Plasma](https://wiki.archlinux.org/index.php/Qt#Configuration_of_Qt5_apps_under_environments_other_than_KDE_Plasma). `qt5ct` provides a Qt5 QPA independent of the desktop environment and a configuration utility.
+
+	```bash
+	$ sudo pacman -S qt5ct qt5-styleplugins
+	```
+
+2. Set the environment variable `QT_QPA_PLATFORMTHEME="qt5ct"` so that the settings are picked up by Qt applications. You can set the environment variable in your `~/.xprofile` or something.
+
+3. Log out, so the environment variable can take effect. Log in. 
+
+4. Install `kvantum-qt5`. Kvantum manager is an SVG-based theme engine for Qt5. This will be the main tool that will provide us the full blur effect and those sweet eyecandies.
+
+	```bash
+	$ sudo pacman -S kvantum-qt5
+	```
+
+5. Install a kvantum theme. I recommend the [Inverse-dark](https://store.kde.org/p/1365482/) theme, because it's clean and modern looking. An edited version is in my [repo](https://github.com/manilarome/the-glorious-dotfiles/tree/master/config/Kvantum/Inverse-dark) and it's the one I've used in my screenshots above.
+
+6. Open `kvantummanager` to set your desired kvantum theme. You can configure the active theme to make some changes like making the dolphin view transparent, disable tooltip shadows, etc., etc.
+
+6. Run `qt5ct` again. Change the `style` to `kvantum` to use the kvantum theme. Hit `OK`.
+
+7. Open a Qt5 app. Enjoy.
+
+
+#### Install an Icon theme
+
+A part of basic ricing is improving the icon theme.
+
+1. Install an icon theme. My main icon theme is [`Tela`](https://github.com/vinceliuice/Tela-icon-theme), but not all the icons are covered by it so I'm also using [`Papirus`](https://github.com/PapirusDevelopmentTeam/papirus-icon-theme) as *inherits*.
+
+	```bash
+	# Install Papirus Icon
+	$ sudo pacman -S papirus-icon-theme
+	# Install Tela Icon
+	$ yay -S tela-icon-theme-git
+	```
+
+2. Add `Papirus` as inherits of `Tela`.
+
+	```bash
+	$ sudoedit /usr/share/icons/Tela/index.theme
+	```
+
+	Find `Inherits` then add `Papirus`.
+
+	```
+		Inherits=Papirus,Papirus-Dark,hicolor
+	```
+
+3. Set your theme in `lxappearance` and `qt5ct`.
 
 #### Font Installation
 
-Let's be honest, font rendering in Linux *is not that* good by default. So make them great again! Let's start with installing some beautiful fonts.
+Let's be honest, font rendering in Linux *is not that* good by default. So let's make them great again! Let's start with installing some beautiful fonts.
 
 ```bash
 # Basic fonts
@@ -939,6 +1040,20 @@ $ sudo pacman -S ttf-dejavu ttf-liberation noto-fonts noto-fonts-emoji
 # macOS fonts. I just love macOS Fonts
 $ yay -S otf-san-francisco-pro otf-sfmono-patched 
 ```
+
+#### Install a Cursor theme
+
+Let's make the cursor theme more modern looking!
+
+[`Vimix Cursor`](https://github.com/vinceliuice/Vimix-cursors) is a beautiful theme! It can be found in the AUR.
+
+1. Install the theme.
+
+	```bash
+	$ yay -S vimix-cursors
+	```
+
+2. Set the theme in your `qt5ct` and `lxappearance`.
 
 #### Improve Font Rendering
 
@@ -999,7 +1114,7 @@ Make your system fonts great again! Improve your fonts for system-wide usage wit
 	</fontconfig>
 	```
 
-4. Set your font settings to match above in your DE system settings.
+4. Set your font settings to match above in your DE system settings. Open `qt5ct` and `lxappearance` then set the font to your preference.
 
 You can also follow this [guide](https://jichu4n.com/posts/how-to-set-default-fonts-and-font-aliases-on-linux/).
 
@@ -1125,11 +1240,6 @@ More info about Powerlevel10k [here](https://github.com/romkatv/powerlevel10k)
 | redshift |
 | arandr |
 
-| settings |
-| --- |
-| lxappearance |
-| qt5ct |
-| qt5-styleplugins |
 
 | vbox |
 | --- |
