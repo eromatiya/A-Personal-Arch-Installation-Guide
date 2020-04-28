@@ -423,6 +423,8 @@ linux /vmlinuz-linux
 initrd  /initramfs-linux.img  
 options root=/dev/sda3 rw
 ```
+**Note:**  
+If your `root` is not in `/dev/sda3`, make sure to change it.
 
 Save and exit.
 
@@ -1221,7 +1223,7 @@ After rebooting, let's now improve the `zsh` prompt.
 
 7. Open a terminal. There should be some instructions/dialog there that will greet you and will guide you to theme your Powerlevel10k prompt.
 
-More info about Powerlevel10k [here](https://github.com/romkatv/powerlevel10k)
+More info about Powerlevel10k [here](https://github.com/romkatv/powerlevel10k).
 
 #### Use `gtk3-mushrooms` a patched GTK3
 
@@ -1262,6 +1264,7 @@ So the real question is why did the `GNOME` team keeps removing the best feature
 
 **`aircrack-ng`** as deauth program  
 **`fluxion`** as  MiTM program  
+**`create_ap`** as NATed/Bridged Software Access Point
 
 #### Terminal eyecandies
 
