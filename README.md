@@ -515,7 +515,7 @@ GTK, or the GIMP Toolkit, is a multi-platform toolkit for creating graphical use
 $ sudo pacman -S unrar unzip p7zip gvfs-mtp libmtp ntfs-3g android-udev ffmpegthumbnailer mtpfs xdg-user-dirs
 
 # File managers
-$ sudo pacman -S dolphin kde-cli-tools ranger
+$ sudo pacman -S dolphin dolphin-plugins kde-cli-tools ranger
 ```
 
 `xdg-user-dirs` is a tool to help manage "well known" user directories like the desktop folder and the music folder so generate XDG user directories by:
