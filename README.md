@@ -179,7 +179,10 @@ $ systemctl start dhcpcd@enp3s0
 If you are on a laptop, you can connect to a wireless access point using wifi-menu -o <wireless_interface>.
 
 ```bash
-$ systemctl enable netctl  
+# Enable netctl systemd service
+$ systemctl start netctl  
+
+# Search and Connect to wifi using your wifi interface
 $ wifi-menu wlp7s0
 ```  
 
@@ -363,7 +366,10 @@ While you're at it, **you can add colors and PAC-MAN in pacman!**
 Open `/etc/pacman.conf`, then find `# Misc options`. After that, **below** that, add:
 
 ```
+# Uncomment Color
 Color
+
+# Add ILoveCandy
 ILoveCandy
 ```
 
@@ -454,7 +460,7 @@ $ sudo pacman -S xorg-server xorg-xrdb xorg-xinit xorg-xrandr xorg-xev xorg-xdpy
 After installing the graphical server, we need to install the video drivers. I'm using an integrated intel graphics card.
 
 ```bash
-$ sudo pacman -S xf86-video-intel vulkan-intel vulkan-intel lib32-vulkan-intel vulkan-icd-loader lib32-vulkan-icd-loader lib32-mesa
+$ sudo pacman -S xf86-video-intel vulkan-intel lib32-vulkan-intel vulkan-icd-loader lib32-vulkan-icd-loader lib32-mesa
 ```
 
 Add your (kernel) graphics driver to your initramfs. For example, if using intel add **`i915`**: 
@@ -470,6 +476,14 @@ Then add `i915` to your initramfs:
 
 ```
 MODULES=(i915 ...)
+```
+
+#### Install Input Drivers
+
+I'm using a touchpad so install a driver for it.
+
+```bash
+$ sudo pacman -S xf86-input-synaptics
 ```
 
 #### Install audio drivers
@@ -499,6 +513,7 @@ GTK, or the GIMP Toolkit, is a multi-platform toolkit for creating graphical use
 ```bash
 # File system tools
 $ sudo pacman -S unrar unzip p7zip gvfs-mtp libmtp ntfs-3g android-udev ffmpegthumbnailer mtpfs xdg-user-dirs
+
 # File managers
 $ sudo pacman -S dolphin kde-cli-tools ranger
 ```
@@ -509,18 +524,18 @@ $ sudo pacman -S dolphin kde-cli-tools ranger
 $ xdg-user-dirs-update
 ```
 
+#### Terminal Emulator
+
+We need a terminal emulator. Every linux user's first partner.
+
+```bash
+$ sudo pacman -S kitty xterm
+```
+
 #### Install GUI and CLI web browser
 
 ```bash
 $ sudo pacman -S firefox w3m
-```
-
-#### Terminal Emulator
-
-Of course, we need a terminal emulator
-
-```bash
-$ sudo pacman -S kitty xterm
 ```
 
 #### Install git
@@ -560,6 +575,7 @@ Install an editor.
 ```bash
 # Editor for CLI
 $ sudo pacman -S vim
+
 # EDITOR for GUI
 $ yay -S sublime-text-dev
 ```
@@ -608,6 +624,7 @@ Plymouth provides a flicker-free graphical boot process.
 	```bash
 	# Install
 	$ yay -S plymouth-git
+
 	# If you also use GDM, you should install the gdm-plymouth, which compiles gdm with plymouth support. 
 	$ yay -S gdm-plymouth
 	```
@@ -629,6 +646,7 @@ Plymouth provides a flicker-free graphical boot process.
 	```bash
 	# List all the installed plymouth theme
 	$ sudo plymouth-set-default-theme -l
+
 	# Select a theme then rebuild  initrd
 	$ sudo plymouth-set-default-theme -R theme_name
 	```
@@ -667,6 +685,7 @@ Processor manufacturers release stability and security updates to the processor 
 	```bash
 	# For AMD processors
 	$ sudo pacman -S amd-ucode
+
 	# For intel processors
 	$ sudo pacman -S intel-ucode
 	```
@@ -834,11 +853,11 @@ We'll use `blueman` for this. Blueman is a full featured Bluetooth manager writt
 	$ sudo systemctl enable tlp.service
 	```
 
-2. Install `acpid` and `acpi_call`:
+2. Install `upower`, `acpid` and `acpi_call`:
 
 	```bash
 	# Install
-	$ sudo pacman -S acpid acpi_call
+	$ sudo pacman -S acpid acpi_call upower
 	# Enable acpid
 	$ sudo systemctl enable acpid.service
 	```
