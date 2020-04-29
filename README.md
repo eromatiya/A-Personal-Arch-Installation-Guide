@@ -489,7 +489,7 @@ $ sudo pacman -S xf86-input-synaptics
 #### Install audio drivers
 
 ```bash
-$ sudo pacman -S alsa-utils pulseaudio-alsa pulseaudio-bluetooth pulseaudio pavucontrol pulseeffects
+$ sudo pacman -S alsa-utils pulseaudio-alsa pulseaudio-bluetooth pulseaudio pavucontrol
 ```
 
 #### Install GTK3 and GTK2
@@ -1278,6 +1278,8 @@ So the real question is why did the `GNOME` team keeps removing the best feature
 **`feh`** as image viewer  
 **`perl-image-exiftool`** as reader and rewriter of EXIF informations that supports raw files  
 **`simplescreenrecorder`** as screen recorder  
+**`pulseeffects`** as equalizer  
+**`pavucontrol-qt`** as pulseaudio mixer
 
 #### Network tools
 
@@ -1308,7 +1310,8 @@ So the real question is why did the `GNOME` team keeps removing the best feature
 **`mugshot`** as personal user details updater  
 **`pamac-aur`** as frontend for libalpm  
 **`toilet`** as ascii generator tool  
-**`dconf-editor`** as dconf editor  
+**`dconf-editor`** as dconf editor   
+**`tranmission-qt`** as BitTorrent client
 
 #### Hotel
 
