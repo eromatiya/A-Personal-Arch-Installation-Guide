@@ -560,6 +560,13 @@ $ cd yay
 $ makepkg -sri
 ```
 
+#### Install missing kernel modules.
+
+```bash
+$ yay -S wd719x-firmware aic94xx-firmware --removemake --noconfirm
+$ sudo mkinitcpio -p linux
+```
+
 #### Backlight Control
 
 We'll use `light` for this because this is a better version of `xorg-xbacklight`.
@@ -652,13 +659,6 @@ Plymouth provides a flicker-free graphical boot process.
 	```
 
 4. You now need to append `splash` in the kernel parameters. See [Silent Boot](#silent-boot).
-
-#### Install missing kernel modules.
-
-```bash
-$ yay -S wd719x-firmware aic94xx-firmware --removemake --noconfirm
-$ sudo mkinitcpio -p linux
-```
 
 #### Silent boot
 
@@ -843,6 +843,21 @@ We'll use `blueman` for this. Blueman is a full featured Bluetooth manager writt
 	```bash
 	$ gsettings set org.blueman.plugins.powermanager auto-power-on false
 	```
+
+#### Authentication Managers
+
+Polkit is used for controlling system-wide privileges. It provides an organized way for non-privileged processes to communicate with privileged ones. In contrast to systems such as sudo, it does not grant root permission to an entire process, but rather allows a finer level of control of centralized system policy. 
+
+1. Install `polkit`, `polkit-kde-agent`/`polkit-gnome`, and `gnome-keyring`.
+
+``` bash
+# I'm using Qt apps so I'll install polkit-kde-agent
+$ sudo pacman -S polkit polkit-kde-agent gnome-keyring
+# For polkit-kde-agent, run:
+$ /usr/lib/polkit-kde-authentication-agent-1
+# For polkit-gnome
+$ /usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1
+```
 
 #### Better Power Management
 
