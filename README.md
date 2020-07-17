@@ -1108,7 +1108,7 @@ Make your system fonts great again! Improve your fonts for system-wide usage wit
 	<fontconfig>
 			<match>
 					<edit mode="prepend" name="family">
-						<string>SF Pro Text</string>
+						<string>Inter</string>
 					</edit>
 			</match>
 			<match target="pattern">
