@@ -460,7 +460,7 @@ $ sudo pacman -S xorg-server xorg-xrdb xorg-xinit xorg-xrandr xorg-xev xorg-xdpy
 After installing the graphical server, we need to install the video drivers. I'm using an integrated intel graphics card.
 
 ```bash
-$ sudo pacman -S xf86-video-intel vulkan-intel lib32-vulkan-intel vulkan-icd-loader lib32-vulkan-icd-loader lib32-mesa
+$ sudo pacman -S xf86-video-intel vulkan-intel lib32-vulkan-intel vulkan-icd-loader lib32-vulkan-icd-loader lib32-mesa libva-intel-driver
 ```
 
 Add your (kernel) graphics driver to your initramfs. For example, if using intel add **`i915`**: 
@@ -670,10 +670,10 @@ This is for who prefer to limit the verbosity of their system to a strict minimu
 	$ sudoedit /boot/loader/entries/arch.conf
 	```
 
-2. Add these parameters `(options ... loglevel=3 vga=current rd.udev.log_priority=3 ...)` in the `options`:
+2. Add these parameters `(options ... loglevel=3 vga=current rd.udev.log_priority=3 fbcon=nodefer ...)` in the `options`:
 
 	```
-	options quiet splash loglevel=3 vga=current rd.udev.log_priority=3
+	options quiet splash loglevel=3 vga=current rd.udev.log_priority=3 fbcon=nodefer
 	```
 
 #### Microcode
@@ -1327,6 +1327,7 @@ So the real question is why did the `GNOME` team keeps removing the best feature
 **`toilet`** as ascii generator tool  
 **`dconf-editor`** as dconf editor   
 **`tranmission-qt`** as BitTorrent client
+**`htop`** as interactive process viewer
 
 #### Hotel
 
