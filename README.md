@@ -1155,7 +1155,65 @@ Let's make the cursor theme more modern looking!
 
 2. Set the theme in your `qt5ct` and `lxappearance`.
 
-#### Improve Terminal Experience
+#### Improve Terminal Experience with FISH
+
+`fish` is better than `zsh`, in my honest opinion. Why? In fish, you don't have to install tons of plugins using `oh-my-zsh`. And kinda lighter and less bloaty.
+
+0. Before starting, we may want to see what shell is currently being used: 
+
+	```bash
+	$ echo $SHELL
+	```
+
+1. Not using FISH? Then install the `fish` package.
+
+	```bash
+	$ sudo pacman -S fish
+	```
+
+2. Make sure that fish has been installed correctly by running the following in a terminal: 
+
+	```bash
+	$ fish
+	```
+
+3. Change your `$SHELL` from whatever you're using right now to `FISH`.
+
+	```bash
+	# User
+	$ chsh -s $(which fish)
+
+	# System-wide
+	$ sudo chsh -s $(which fish)
+	```
+
+	It's better if you `reboot` your system.
+
+
+#### Install `[oh-my-fish](https://github.com/oh-my-fish/oh-my-fish)`
+
+After rebooting, let's now improve the `fish` experience.
+
+1. Install oh-my-fish.
+
+	```fish
+	$ curl -L https://get.oh-my.fish | fish
+	```
+
+2. Install a prompt theme. There's a bunch of themes available that can be found [here](https://github.com/oh-my-fish/oh-my-fish/blob/master/docs/Themes.md). For example, let's install `pastfish`, my favorite.
+
+	```fish
+	$ omf install pastfish
+	```
+3. The theme will automatically activated, if not:
+
+	```fish
+	$ omf theme pastfish
+	```
+	
+4. Of course, you probably need a nerd font or something if the prompt is ugly.
+
+#### Improve Terminal Experience with ZSH
 
 Improve your terminal experience! Let's replace `bash` with `zsh`. `Zsh` is a powerful shell that operates as both an interactive shell and as a scripting language interpreter. 
 
