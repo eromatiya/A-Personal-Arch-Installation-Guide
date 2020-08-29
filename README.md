@@ -1157,7 +1157,7 @@ Let's make the cursor theme more modern looking!
 
 #### Improve Terminal Experience with FISH
 
-`fish` is better than `zsh`, in my honest opinion. Why? In fish, you don't have to install tons of plugins using `oh-my-zsh`. And kinda lighter and less bloaty.
+`fish` is better than `zsh`, in my honest opinion. Why? The defaults in fish are great! No need to install a package or a plugin to have, for example autocompletion, etc.
 
 0. Before starting, we may want to see what shell is currently being used: 
 
@@ -1177,18 +1177,14 @@ Let's make the cursor theme more modern looking!
 	$ fish
 	```
 
-3. Change your `$SHELL` from whatever you're using right now to `FISH`.
+3. Set `fish` as interactive shell. We will still use `bash` as the default shell. Not setting fish as system wide or user default allows the current Bash scripts to run on startup. It ensures the current user's environment variables are unchanged and are exported to fish which then runs as a Bash child. Add this on your `~/.bashrc`.
 
 	```bash
-	# User
-	$ chsh -s $(which fish)
-
-	# System-wide
-	$ sudo chsh -s $(which fish)
+	if [[ $(ps --no-header --pid=$PPID --format=cmd) != "fish" ]]
+	then
+		exec fish
+	fi
 	```
-
-	It's better if you `reboot` your system.
-
 
 #### Install `[oh-my-fish](https://github.com/oh-my-fish/oh-my-fish)`
 
@@ -1205,13 +1201,23 @@ After rebooting, let's now improve the `fish` experience.
 	```fish
 	$ omf install pastfish
 	```
-3. The theme will automatically activated, if not:
+
+3. The theme will be automatically activated, if not:
 
 	```fish
 	$ omf theme pastfish
 	```
+
+4. Install useful plugins
 	
-4. Of course, you probably need a nerd font or something if the prompt is ugly.
+	```fish
+	$ omf install archlinux
+	$ omf install cd
+	$ omf install colorman
+	$ echo "source ~/.local/share/omf/pkg/colorman/init.fish" >> ~/.config/fish/config.fish
+	```
+	
+4. Of course, you probably need a nerd font or something if the prompt is "broken".
 
 #### Improve Terminal Experience with ZSH
 
