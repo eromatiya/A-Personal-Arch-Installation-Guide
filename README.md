@@ -161,14 +161,14 @@ You should see something like this:
 ```
 1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN mode DEFAULT group default qlen 1000
 		link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
-2: enp0s30: <NO-CARRIER,BROADCAST,MULTICAST,UP> mtu 1500 qdisc fq_codel state DOWN mode DEFAULT group default qlen 1000
+2: enp0s0: <NO-CARRIER,BROADCAST,MULTICAST,UP> mtu 1500 qdisc fq_codel state DOWN mode DEFAULT group default qlen 1000
 		link/ether 00:00:00:00:00:00 brd ff:ff:ff:ff:ff:ff
-3: wlp7s0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc mq state UP mode DORMANT group default qlen 1000
+3: wlan0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc mq state UP mode DORMANT group default qlen 1000
 		link/ether 00:00:00:00:00:00 brd ff:ff:ff:ff:ff:ff permaddr 00:00:00:00:00:00
 ```
 
-**`enp0s30`** is the wired interface  
-**`wlp7s0`** is the wireless interface  
+**`enp0s0`** is the wired interface  
+**`wlan0`** is the wireless interface  
 
 If you are on a wired connection, you can enable your wired interface by systemctl start dhcpcd@<interface>.  
 
@@ -176,20 +176,30 @@ If you are on a wired connection, you can enable your wired interface by systemc
 $ systemctl start dhcpcd@enp3s0
 ```
 
-If you are on a laptop, you can connect to a wireless access point using wifi-menu -o <wireless_interface>.
+If you are on a laptop, you can connect to a wireless access point using `iwctl` command from `iwd`. Note that it's already enabled by default.
+
+Scan for network.
 
 ```bash
-# Enable netctl systemd service
-$ systemctl start netctl  
+$ iwctl station wlan0 scan
+```
 
-# Search and Connect to wifi using your wifi interface
-$ wifi-menu wlp7s0
-```  
+Get the list of scanned networks by:
+
+```bash
+$ iwctl station wlan0 get-networks
+```
+
+Connect to your network.
+
+```bash
+$ iwctl -P "PASSPHRASE" station wlan0 connect "NETWORKNAME"
+```
 
 Ping google to make sure we are online:
 
 ```bash
-$ ping -c 3 8.8.8.8
+$ ping -c 5 8.8.8.8
 ``` 
 
 If you receive Unknown host or Destination host unreachable response, means you are not online yet. Review your network configuration and redo the steps above.
@@ -230,11 +240,26 @@ We don’t need to mount **`swap`** since it is already enabled.
 
 ### Installing the base and linux packages
 
-Now let’s go ahead and install **`base`**, **`linux`** and **`base-devel`** packages into our system. The kernel is not included in the base group including other application like editors. Even the lovely **`nano`** doesn't survived the snap.  
-So let's also install the packages detached from the base group.  
+Now let’s go ahead and install **`base`**, **`linux`**, **`linux-firmware`**, and **`base-devel`** packages into our system. 
 
 ```bash
-$ pacstrap /mnt base linux linux-firmware base-devel less logrotate man-db man-pages which dhcpcd netctl inetutils jfsutils mdadm perl reiserfsprogs sysfsutils systemd-sysvcompat texinfo usbutils xfsprogs s-nail nano iputils
+$ pacstrap /mnt base linux linux-firmware
+```
+
+It's recommended to also install these utilities. If you ignore these, it will bite you in the ass in the future, I swear *(No, this is not a threat)*:
+
+```bash
+# Networking
+$ pacstrap /mnt dhcpcd iwd iputils inetutils
+
+# Man and info pages
+$ pacstrap /mnt man-db man-pages texinfo
+
+# Text editors
+$ pacstrap /mnt nano vim
+
+# More useful utilities
+$ pacstrap /mnt less which perl systemd-sysvcompat usbutils
 ```
 
 It's your decision if you want to all install the packages.
@@ -247,7 +272,6 @@ Just hit enter/yes for all the prompts that come up. Wait for Arch to finish ins
 ```bash
 $ genfstab -U /mnt >> /mnt/etc/fstab
 ```  
-
 
 ### Chroot time
 
@@ -293,7 +317,6 @@ If you set the keyboard layout, make the changes persistent in vconsole.conf:
 echo 'KEYMAP=us' > /etc/vconsole.conf
 ```
 
-
 ### Network configuration
 
 Create the hostname file:  
@@ -328,12 +351,12 @@ For LVM, system encryption or RAID, modify mkinitcpio.conf and recreate the init
 $ mkinitcpio -p linux
 ```
 
-### Wireless Connections
+### Network Connection
 
-For wireless connections, install iw, wpa_supplicant, and (for wifi-menu) dialog. **This is needed if you want to use a wi-fi connection after the next reboot!**
+To have an internet connection on your next reboot, you need to enable `dhcpcd.service`, `systemd-networkd.service`, `systemd-resolved.service` and `iwd.service`. **Do not forget this! Or else, you will plug your installation media again to do this on chroot!**
 
 ```bash
-$ pacman -S iw wpa_supplicant dialog
+$ systemctl enable dhcpcd systemd-networkd systemd-resolved iwd
 ```
 
 ### Adding Repositories
@@ -505,7 +528,7 @@ GTK, or the GIMP Toolkit, is a multi-platform toolkit for creating graphical use
 2. Install GTK engines
 
 	```bash
-	$ sudo pacman -S gtk-engine-murrine gtk-engines
+	$ sudo pacman -S gtk-engine-murrine gtk-engines gnome-theme-extra
 	```
 
 #### Install file system tools and file manager
@@ -749,7 +772,7 @@ $ reboot
 
 #### Install and Configure Network Manager
 
-As of now, we're using `netctl` if we're using wireless connection and `dhcpcd` if we're on wired connection. So it's time to install a GUI to connect to the internet.
+As of now, we're using `iwd` if we're using wireless connection and `dhcpcd` if we're on wired connection. So it's time to install a GUI to connect to the internet.
 
 1. Install network manager and its utilities.
 
@@ -757,15 +780,14 @@ As of now, we're using `netctl` if we're using wireless connection and `dhcpcd` 
 	$ sudo pacman -S networkmanager network-manager-applet dhclient modemmanager usb_modeswitch mobile-broadband-provider-info
 	```
 
-2. Disable netctl or dhcpcd.
+2. Disable `iwd` or `dhcpcd`.
 
 	```bash
-	# If using netctl
-	# Stop current connection
-	$ sudo netctl stop profile_name
-	$ sudo netctl disable profile_name
-	$ sudo systemctl stop netctl
-	$ sudo systemctl disable netctl
+	# If using iwd
+	# Disconnect from connection
+	$ sudo iwctl station wlan0 disconnect
+	$ sudo systemctl stop iwd
+	$ sudo systemctl disable iwd
 
 	# If using dhcpcd
 	$ sudo systemctl stop dhcpcd
@@ -1335,13 +1357,13 @@ More info about Powerlevel10k [here](https://github.com/romkatv/powerlevel10k).
 
 One of the things I don't like is using GTK3 apps that have a CSD or client-side decoration with a window manager. It removes the unified look because some apps have CSDs and some don't. That's why I'm using a patched version of `GTK3` called [`gtk3-mushrooms`](https://github.com/krumelmonster/gtk3-mushrooms). `gtk3-mushrooms` is a set of patches for GTK3 library that makes it better.
 
-Install `gtk3-mushrooms` and replace the vanilla `gtk3`.
+Install `gtk3-classic` a package based on `gtk3-mushrooms` that contains additional patches that will replace remove `gtk3`'s CSDs.
 
 ```zsh
-$ yay -S gtk3-mushrooms
+$ yay -S gtk3-classic
 ```
 
-Notable changes after installing `gtk3-mushrooms`:
+Notable changes after installing `gtk3-classic`:
 
 + CSDs are totally disabled by default.
 + Typeahead feature is restored.
