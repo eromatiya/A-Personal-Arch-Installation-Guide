@@ -631,10 +631,10 @@ $ sudo pacman -S plasma-desktop
 
 #### Install a compositor
 
-I will be using `picom-tryone-git` for AUR.
+I will be using `picom-git` for AUR.
 
 ```bash
-$ yay -S picom-tryone-git --noconfirm --removemake
+$ yay -S picom-git --noconfirm --removemake
 ```
 
 #### Install an application launcher. 
