@@ -1161,29 +1161,37 @@ Let's make the cursor theme more modern looking!
 
 0. Before starting, we may want to see what shell is currently being used: 
 
-	```bash
+	```fish
 	$ echo $SHELL
 	```
 
 1. Not using FISH? Then install the `fish` package.
 
-	```bash
+	```fish
 	$ sudo pacman -S fish
 	```
 
 2. Make sure that fish has been installed correctly by running the following in a terminal: 
 
-	```bash
+	```fish
 	$ fish
 	```
 
 3. Set `fish` as interactive shell. We will still use `bash` as the default shell. Not setting fish as system wide or user default allows the current Bash scripts to run on startup. It ensures the current user's environment variables are unchanged and are exported to fish which then runs as a Bash child. Add this on your `~/.bashrc`.
 
-	```bash
+	```fish
 	if [[ $(ps --no-header --pid=$PPID --format=cmd) != "fish" ]]
 	then
 		exec fish
 	fi
+	```
+
+4. Install `pkgfile` to enable `Command not found` hook.
+
+	```fish
+	$ sudo pacman -S pkgfile
+	# Update pkgfile databse
+	$ sudo pkgfile --update
 	```
 
 #### Install `[oh-my-fish](https://github.com/oh-my-fish/oh-my-fish)`
