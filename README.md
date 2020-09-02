@@ -1179,7 +1179,7 @@ Let's make the cursor theme more modern looking!
 
 #### Improve Terminal Experience with FISH
 
-`fish` is better than `zsh`, in my honest opinion. Why? The defaults in fish are great! No need to install a package or a plugin to have, for example autocompletion, etc.
+`fish` is better than `zsh`, in my honest opinion. Why? The defaults are great! No need to install a package or a plugin to have, for example autocompletion, etc. In it's snappy af! A highly recommended shell!
 
 0. Before starting, we may want to see what shell is currently being used: 
 
@@ -1216,6 +1216,12 @@ Let's make the cursor theme more modern looking!
 	$ sudo pkgfile --update
 	```
 
+5. Update autosuggestion database by running:
+	
+	```fish
+	$ fish_update_completions
+	```
+
 #### Install `[oh-my-fish](https://github.com/oh-my-fish/oh-my-fish)`
 
 After rebooting, let's now improve the `fish` experience.
@@ -1226,28 +1232,17 @@ After rebooting, let's now improve the `fish` experience.
 	$ curl -L https://get.oh-my.fish | fish
 	```
 
-2. Install a prompt theme. There's a bunch of themes available that can be found [here](https://github.com/oh-my-fish/oh-my-fish/blob/master/docs/Themes.md). For example, let's install `pastfish`, my favorite.
+2. Install a prompt theme. There's a bunch of themes available that can be found [here](https://github.com/oh-my-fish/oh-my-fish/blob/master/docs/Themes.md). Speaking of themes, I created my own and you can find it [here](https://github.com/manilarome/fishblocks). Install the theme you want, then move on. Installing a theme from `omf` is easy, just run `omf install THEMENAME` and it will do its job.
 
-	```fish
-	$ omf install pastfish
-	```
-
-3. The theme will be automatically activated, if not:
-
-	```fish
-	$ omf theme pastfish
-	```
-
-4. Install useful plugins
+3. Install some useful plugins.
 	
 	```fish
-	$ omf install archlinux
-	$ omf install cd
-	$ omf install colorman
+	$ omf install archlinux bang-bang cd colorman sudope vcs
+	# colorman plugin need to be source
 	$ echo "source ~/.local/share/omf/pkg/colorman/init.fish" >> ~/.config/fish/config.fish
 	```
 	
-4. Of course, you probably need a nerd font or something if the prompt is "broken".
+4. Of course, you probably need a nerd font or something if the prompt is "broken". MesloLGS NF is recommended. You can download and install it from the [AUR](ttf-meslo-nerd-font-powerlevel10k) or manually [here](https://github.com/romkatv/powerlevel10k#meslo-nerd-font-patched-for-powerlevel10k).
 
 #### Improve Terminal Experience with ZSH
 
@@ -1311,10 +1306,14 @@ After rebooting, let's now improve the `zsh` prompt.
 
 #### Improve Terminal Prompt using PowerLevel10k
 
-1. Download the recommended font [here](https://github.com/romkatv/powerlevel10k#meslo-nerd-font-patched-for-powerlevel10k).
+1. Download the recommended font manually [here](https://github.com/romkatv/powerlevel10k#meslo-nerd-font-patched-for-powerlevel10k). Or install it from AUR:
+
+	```zsh
+	$ yay -Syu ttf-meslo-nerd-font-powerlevel10k
+	```
 
 
-2. Copy the downloaded font to the right font directory.
+2. If you downloaded the font manually, copy the downloaded font to the right font directory.
 
 	```zsh
 	# User only. If the folder doesn't exist, create it.
