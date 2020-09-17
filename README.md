@@ -1039,19 +1039,11 @@ If we want to change our system font, GTK3, icon and cursor theme. We need a set
 
 1. Install `qt5ct` and `qt5-styleplugins`. We need these tools to [configure Qt5 apps under environments other than KDE Plasma](https://wiki.archlinux.org/index.php/Qt#Configuration_of_Qt5_apps_under_environments_other_than_KDE_Plasma). `qt5ct` provides a Qt5 QPA independent of the desktop environment and a configuration utility.
 
-	```bash
-	$ sudo pacman -S qt5ct qt5-styleplugins
-	```
-
-2. Set the environment variable `QT_QPA_PLATFORMTHEME="qt5ct"` so that the settings are picked up by Qt applications. You can set the environment variable in your `~/.xprofile` or something.
+2. Set the environment variable `QT_QPA_PLATFORMTHEME="qt5ct"` so that the settings are picked up by Qt applications. You can set the environment variable in your `~/.xprofile` and `/etc/environment` for global settings.
 
 3. Log out, so the environment variable can take effect. Log in. 
 
 4. Install `kvantum-qt5`. Kvantum manager is an SVG-based theme engine for Qt5. This will be the main tool that will provide us the full blur effect and those sweet eyecandies.
-
-	```bash
-	$ sudo pacman -S kvantum-qt5
-	```
 
 5. Install a kvantum theme. I recommend the [Inverse-dark](https://store.kde.org/p/1365482/) theme, because it's clean and modern looking. An edited version is in my [dotfiles](https://github.com/manilarome/the-glorious-dotfiles/tree/master/config/Kvantum/Inverse-dark).
 
@@ -1096,8 +1088,8 @@ Let's be honest, font rendering in Linux *is not that* good by default. So let's
 ```bash
 # Basic fonts
 $ sudo pacman -S ttf-dejavu ttf-liberation noto-fonts noto-fonts-emoji
-# macOS fonts. I just love macOS Fonts
-$ yay -S otf-san-francisco-pro otf-sfmono-patched 
+# Inter font as system font
+$ sudo pacman -S inter-font ttf-roboto
 ```
 
 #### Improve Font Rendering
