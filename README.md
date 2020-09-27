@@ -75,7 +75,7 @@ Now we should be presented with our main drive showing the partition number, par
 +   Just hit enter to select the default option for the first sector.
 +   Now the partion size - Arch wiki recommends 200-300 MB for the boot + size. Let’s make it 500MiB or 1GB in case we need to add more OS to our machine. I’m gonna assign mine with 1024MiB. Hit enter.
 +   Set GUID to **EF00**. Hit enter.
-+   Set name to boot. Hit enter.
++   Set name to `boot`. Hit enter.
 +   Now you should see the new partition in the partitions list with a partition type of EFI System and a partition name of boot. You will also notice there is 1007KB above the created partition. That is the MBR. Don’t worry about that and just leave it there.
 
 #### Create the swap partition
@@ -84,7 +84,7 @@ Now we should be presented with our main drive showing the partition number, par
 +   Just hit enter to select the default option for the first sector.
 +   For the swap partition size, it is advisable to have 1.5 times the size of your RAM. I have 8GB of RAM so I’m gonna put 12GiB for the partition size. Hit enter.
 +   Set GUID to **8200**. Hit enter.
-+   Set name to swap. Hit enter.
++   Set name to `swap`. Hit enter.
 
 #### Create the root partition
 
@@ -92,7 +92,7 @@ Now we should be presented with our main drive showing the partition number, par
 +   Hit enter to select the default option for the first sector.
 +   Hit enter again to input your root size.
 +   Also hit enter for the GUID to select default.
-+   Then set name of the partition to root.
++   Then set name of the partition to `root`.
 
 
 #### Create the home partition
@@ -101,7 +101,7 @@ Now we should be presented with our main drive showing the partition number, par
 +   Hit enter to select the default option for the first sector.
 +   Hit enter again to use the remainder of the disk.
 +   Also hit enter for the GUID to select default.
-+   Then set name of the partition to home.
++   Then set name of the partition to `home`.
 
 Lastly, hit **Write** at the bottom of the patitions list to *write the changes* to the disk. Type `yes` to *confirm* the write command. Now we are done partitioning the disk. Hit **Quit** *to exit cgdisk*.
 
@@ -243,7 +243,7 @@ We don’t need to mount **`swap`** since it is already enabled.
 Now let’s go ahead and install **`base`**, **`linux`**, **`linux-firmware`**, and **`base-devel`** packages into our system. 
 
 ```bash
-$ pacstrap /mnt base linux linux-firmware
+$ pacstrap /mnt base base-devel linux linux-firmware
 ```
 
 It's recommended to also install these utilities. If you ignore these, it will bite you in the ass in the future, I swear *(No, this is not a threat)*:
@@ -252,20 +252,17 @@ It's recommended to also install these utilities. If you ignore these, it will b
 # Networking
 $ pacstrap /mnt dhcpcd iwd iputils inetutils
 
-# Man and info pages
-$ pacstrap /mnt man-db man-pages texinfo
+# Manpages
+$ pacstrap /mnt man-db man-pages
 
 # Text editors
 $ pacstrap /mnt nano vim
 
 # More useful utilities
-$ pacstrap /mnt less which perl systemd-sysvcompat usbutils
+$ pacstrap /mnt less usbutils
 ```
 
-It's your decision if you want to all install the packages.
-
-Just hit enter/yes for all the prompts that come up. Wait for Arch to finish installing the base, linux and base-devel and other packages.  
-
+It's your decision if you want to all install these packages.
 
 ### Generating the fstab
 
@@ -273,7 +270,7 @@ Just hit enter/yes for all the prompts that come up. Wait for Arch to finish ins
 $ genfstab -U /mnt >> /mnt/etc/fstab
 ```  
 
-### Chroot time
+### Chroot
 
 Now, chroot to the newly installed system  
 
@@ -353,10 +350,10 @@ $ mkinitcpio -p linux
 
 ### Network Connection
 
-To have an internet connection on your next reboot, you need to enable `dhcpcd.service`, `systemd-networkd.service`, `systemd-resolved.service` and `iwd.service`. **Do not forget this! Or else, you will plug your installation media again to do this on chroot!**
+To have an internet connection on your next reboot, you need to enable `dhcpcd.service` for wired connection and `iwd.service` for a wireless one. **Do not forget this! Or else, you will plug your installation media again to do this on chroot!**
 
 ```bash
-$ systemctl enable dhcpcd systemd-networkd systemd-resolved iwd
+$ systemctl enable dhcpcd iwd
 ```
 
 ### Adding Repositories
@@ -483,7 +480,7 @@ $ sudo pacman -S xorg-server xorg-xrdb xorg-xinit xorg-xrandr xorg-xev xorg-xdpy
 After installing the graphical server, we need to install the video drivers. I'm using an integrated intel graphics card.
 
 ```bash
-$ sudo pacman -S xf86-video-intel vulkan-intel lib32-vulkan-intel vulkan-icd-loader lib32-vulkan-icd-loader lib32-mesa libva-intel-driver
+$ sudo pacman -S xf86-video-intel vulkan-intel vulkan-icd-loader libva-intel-driver
 ```
 
 Add your (kernel) graphics driver to your initramfs. For example, if using intel add **`i915`**: 
@@ -499,14 +496,6 @@ Then add `i915` to your initramfs:
 
 ```
 MODULES=(i915 ...)
-```
-
-#### Install Input Drivers
-
-I'm using a touchpad so install a driver for it.
-
-```bash
-$ sudo pacman -S xf86-input-synaptics
 ```
 
 #### Install audio drivers
@@ -770,9 +759,9 @@ We're almost there! You can now login to you system with all the configuration w
 $ reboot
 ```
 
-#### Install and Configure Network Manager
+#### Install and Configure Network Manager (Optional)
 
-As of now, we're using `iwd` if we're using wireless connection and `dhcpcd` if we're on wired connection. So it's time to install a GUI to connect to the internet.
+As of now, we're using `iwd` if we're using wireless connection and `dhcpcd` if we're on wired connection. Of course, if you're a minimalist, these tools are enough. But if you want a GUI network manager like `network-manager`:
 
 1. Install network manager and its utilities.
 
@@ -812,23 +801,35 @@ Run `network-manager-applet` to have the network manager applet in you system tr
 
 MAC randomization can be used for increased privacy by not disclosing your real MAC address to the network. 
 
-1. Install macchanger.
++ Randomization for iwd
 
-	```bash
-	$ sudo pacman -S macchanger
-	```
+	1. Create and edit `/etc/iwd/main.conf`. Then add the following lines:
 
-2. Create `30-mac-randomization.conf` in your `/etc/NetworkManager/conf.d/`. Add this:
+		```
+		[General]
+		AddressRandomization=once
+		AddressRandomizationRange=nic
+		```
 
-	```
-	[device-mac-randomization]
-	# "yes" is already the default for scanning
-	wifi.scan-rand-mac-address=yes
++ Randomization for network-manager
 
-	[connection-mac-randomization]
-	ethernet.cloned-mac-address=random
-	wifi.cloned-mac-address=stable
-	```
+	1. Install macchanger.
+
+		```bash
+		$ sudo pacman -S macchanger
+		```
+
+	2. Create `30-mac-randomization.conf` in your `/etc/NetworkManager/conf.d/`. Add this:
+
+		```
+		[device-mac-randomization]
+		# "yes" is already the default for scanning
+		wifi.scan-rand-mac-address=yes
+
+		[connection-mac-randomization]
+		ethernet.cloned-mac-address=random
+		wifi.cloned-mac-address=stable
+		```
 
 #### Bluetooth Connection
 
