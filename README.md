@@ -43,14 +43,18 @@ You should see something like this:
 		link/ether 00:00:00:00:00:00 brd ff:ff:ff:ff:ff:ff permaddr 00:00:00:00:00:00
 ```
 
-`enp0s0` is the wired interface  
-`wlan0` is the wireless interface  
++ `enp0s0` is the wired interface  
++ `wlan0` is the wireless interface  
+
+##### Wired Connection
 
 If you are on a wired connection, you can enable your wired interface by systemctl start `dhcpcd@<interface>`.  
 
 ```
 # systemctl start dhcpcd@enp0s0
 ```
+
+##### Wireless Connection
 
 If you are on a laptop, you can connect to a wireless access point using `iwctl` command from `iwd`. Note that it's already enabled by default.
 
@@ -100,7 +104,7 @@ Results ending in `rom`, `loop` or `airoot` may be ignored.
 
 In this guide, I'll create a two different ways to partition a drive. One for a normal installation, the other one is setting up with an encryption(LUKS/LVM). Let's start with the unecrypted one:
 
-+ Unencrypted filesystem
++ **Unencrypted filesystem**
 
 	- Let’s clean up our main drive to create new partitions for our installation. And yeah, in this guide, we will use `/dev/sda` as our disk.
 
@@ -110,7 +114,7 @@ In this guide, I'll create a two different ways to partition a drive. One for a 
 
 		+ Press <kbd>x</kbd> to enter **expert mode**. Then press <kbd>z</kbd> to *zap* our drive. Then hit <kbd>y</kbd> when prompted about wiping out GPT and blanking out MBR. Note that this will ***zap*** your entire drive so your data will be gone - reduced to atoms after doing this. THIS. CANNOT. BE. UNDONE.
 
-	- Create our partitions by running `cgdisk /dev/sda`
+	- Partitioning
 
 		```
 		# cgdisk /dev/sda
@@ -155,7 +159,7 @@ In this guide, I'll create a two different ways to partition a drive. One for a 
 
 	- Lastly, hit `Write` at the bottom of the patitions list to *write the changes* to the disk. Type `yes` to *confirm* the write command. Now we are done partitioning the disk. Hit `Quit` *to exit cgdisk*. Go to the [next section](#formatting-partitions).
 
-+ Encrypted filesystem - `LVM`
++ **Encrypted filesystem - `LVM`**
 
 	- Let’s clean up our main drive to create new partitions for our installation. And yeah, in this guide, we will use `/dev/sda` as our disk.
 
@@ -218,7 +222,7 @@ You should see *something like this*:
 	| --- | --- | --- | --- | --- | --- | --- |
 	| sda | 8:0 | 0 | 477G | 0 | disk |   |
 	| sda1 | 8:1 | 0 | 1 | 0 | part | /boot |
-	| sda2 | 8:2 | 0 | 1 | 0 | part | [LVM] |
+	| sda2 | 8:2 | 0 | 1 | 0 | part |   |
 
 	**`sda`** is the main disk  
 	**`sda1`** is the boot partition  
@@ -552,19 +556,19 @@ Creating a new initramfs is usually not required, because mkinitcpio was run on 
 
 		- `udev`-based initramfs - default.
 
-			+ Find `HOOKS`. Then change the array to:
+			Find `HOOKS`. Then change the array to:
 
-				```
-				HOOKS=(base udev autodetect keyboard modconf block encrypt lvm2 filesystems fsck)
-				```
+			```
+			HOOKS=(base udev autodetect keyboard modconf block encrypt lvm2 filesystems fsck)
+			```
 
 		- `systemd`-based initramfs.
 
-			+ Find `HOOKS`. Then change the array to something like this:
+			Find `HOOKS`. Then change the array to something like this:
 
-				```
-				HOOKS=(base systemd autodetect keyboard sd-vconsole modconf block sd-encrypt sd-lvm2 filesystems fsck)
-				```
+			```
+			HOOKS=(base systemd autodetect keyboard sd-vconsole modconf block sd-encrypt sd-lvm2 filesystems fsck)
+			```
 
 				Note that you've replaced `udev` with `systemd` and used `sd-encrypt` and `sd-lvm2` instead of `encrypt` and `lvm2`.
 
@@ -637,7 +641,7 @@ Set the root password:
 
 ### Add a user account
 
-Add a new user account. In this guide, I'll just use `MYUSERNAME` as the username of the new user aside from `root` account. (The guide seems redundant, eh?) Of course, change the example username with your own:  
+Add a new user account. In this guide, I'll just use `MYUSERNAME` as the username of the new user aside from `root` account. (My phrasing seems redundant, eh?) Of course, change the example username with your own:  
 
 ```
 # useradd -m -g users -G wheel,storage,power,video,audio,rfkill,input -s /bin/bash MYUSERNAME
@@ -729,16 +733,16 @@ Yeah, this is where we install the bootloader. We'll be using `systemd-boot`, so
 
 + Change loader
 
-```
-# vim /boot/loader/entries/arch.conf
-```
+	```
+	# vim /boot/loader/entries/arch.conf
+	```
 
-Delete all of its content, then replaced it by:
+	Delete all of its content, then replaced it by:
 
-```
-default arch.conf
-timeout 0
-```
+	```
+	default arch.conf
+	timeout 0
+	```
 
 ### Exit chroot and reboot:  
 
@@ -930,7 +934,7 @@ $ yay -S picom-git --noconfirm --removemake
 I will use `rofi`.
 
 ```
-pacman -S rofi
+# pacman -S rofi
 ```
 
 #### Plymouth
@@ -943,7 +947,7 @@ Plymouth provides a flicker-free graphical boot process. A splash screen or a bo
 	$ yay -S plymouth-git
 	```
 
-2. Add `plymouth` to the HOOKS array in mkinitcpio.conf. It must be added after base and udev for it to work: 
+2. Add `plymouth` to the HOOKS array in mkinitcpio.conf. It must be added after base and udev/systemd for it to work: 
 
 	```
 	#edit /etc/mkinitcpio.conf
@@ -1213,33 +1217,35 @@ Note that you don't need to bother with this if you installed a desktop environm
 
 1. Install `polkit-kde-agent`/`lxqt-policykit`/`polkit-gnome`, and `gnome-keyring`.
 
-I'm using Qt apps, so I'll install lxqt-policykit. Note that you only need one authentication manager and gnome-keyring.
+	I'm using Qt apps, so I'll install lxqt-policykit. Note that you only need one authentication manager and gnome-keyring.
 
-```
-# pacman -S polkit polkit-kde-agent gnome-keyring
-```
+	```
+	# pacman -S polkit polkit-kde-agent gnome-keyring
+	```
 
-For lxqt-policykit, run:
+2. Run it
 
-```
-$ /usr/bin/lxqt-policykit-agent
-```
+	For lxqt-policykit, run:
 
-For polkit-kde-agent, run:
+	```
+	$ /usr/bin/lxqt-policykit-agent
+	```
 
-```
-$ /usr/lib/polkit-kde-authentication-agent-1
-```
+	For polkit-kde-agent, run:
 
-For polkit-gnome:
+	```
+	$ /usr/lib/polkit-kde-authentication-agent-1
+	```
 
-```
-$ /usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1
-```
+	For polkit-gnome:
+
+	```
+	$ /usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1
+	```
 
 #### Better Power Management
 
-1. Install and start/enable `TLP`:
+1. Install and start/enable `tlp`:
 
 	```
 	# pacman -S tlp
