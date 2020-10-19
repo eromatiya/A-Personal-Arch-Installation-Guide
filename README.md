@@ -734,7 +734,7 @@ Yeah, this is where we install the bootloader. We'll be using `systemd-boot`, so
 + Change loader
 
 	```
-	# vim /boot/loader/entries/arch.conf
+	# vim /boot/loader/loader.conf
 	```
 
 	Delete all of its content, then replaced it by:
