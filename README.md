@@ -266,45 +266,45 @@ You should see *something like this*:
 		# mkfs.fat -F32 /dev/sda1
 		```
 
-	- Setup LVM partition:
+	- Create the LUKS encrypted container.
 
 		```
 		# cryptsetup luksFormat /dev/sda2
 		```
 
-		- Enter your passphrase.
+		- Enter your passphrase twice.
 
-	- Open LVM partition:
+	- Open the created container
 
 		```
-		# cryptsetup open --type luks /dev/sda2 lvm
+		# cryptsetup open --type luks /dev/sda2 cryptlvm
 		```
 
 		- Enter your passphrase and verify it.
-		- You can check the content of `/dev/mapper/lvm` by using the `ls` command.
+		- The decrypted container is now available at `/dev/mapper/cryptlvm`.
 
-	- Initialize physical volume:
-
-		```
-		# pvcreate /dev/mapper/lvm
-		```
-
-	- Create volume group.
-
-		In this guide. I'll just use `volume` as the volume name.
+	- Create a physical volume on top of the opened LUKS container:
 
 		```
-		# vgcreate volume /dev/mapper/lvm
+		# pvcreate /dev/mapper/cryptlvm
 		```
 
-	- Create logical partitions inside the volume we just created.
+	- Create the volume group named `volume` (or whatever you want), adding the previously created physical volume to it:
 
-		We will create one `swap`, a `root`, and `home` partition. Note that the `volume` is the name of the volume we just create.
+		In this guide. I'll just use `volume` as the volume group name.
+
+		```
+		# vgcreate volume /dev/mapper/cryptlvm
+		```
+
+	- Create all your needed logical volumes on the volume group:
+
+		We will create a `swap`, a `root`, and `home` logical volumes. Note that the `volume` is the name of the volume we just created.
 
 		+ Create our `swap`. I'll assign 1GB to it.
 
 			```
-			# lvcreate -L1G volume -n swap
+			# lvcreate -L 1G volume -n swap
 			```
 
 			This will create `/dev/mapper/volume-swap`.
@@ -312,7 +312,7 @@ You should see *something like this*:
 		+ Create our `root`. In this guide, I'll use 100GB.
 
 			```
-			# lvcreate -L100G volume -n root
+			# lvcreate -L 100G volume -n root
 			```
 
 			This will create `/dev/mapper/volume-root`.
