@@ -348,6 +348,8 @@ So the real question is why did the `GNOME` team keeps removing the best feature
 **`dconf-editor`** as dconf editor   
 **`tranmission-qt`** as BitTorrent client
 **`htop`** as interactive process viewer
+srcpy
+paritionmanager
 
 #### Hotel
 

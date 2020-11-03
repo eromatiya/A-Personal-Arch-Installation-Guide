@@ -56,7 +56,7 @@ MODULES=(i915 ...)
 File system tools
 
 ```
-# pacman -S unrar unzip p7zip gvfs-mtp libmtp ntfs-3g \
+# pacman -S unrar unzip p7zip unarchiver gvfs-mtp libmtp ntfs-3g \
 android-udev mtpfs xdg-user-dirs
 ```
 
