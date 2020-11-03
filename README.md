@@ -302,53 +302,53 @@ You should see *something like this*:
 
 + Create the volume group and name it `volume` (or whatever you want), adding the previously created physical volume to it:
 
-	In this guide. I'll just use `volume` as the volume group name.
+	In this guide, I'll just use `volume` as the volume group name.
 
 	```
 	# vgcreate volume /dev/mapper/cryptlvm
 	```
 
-Create all your needed logical volumes on the volume group. We will create a `swap`, `root`, and `home` logical volumes. Note that the `volume` is the name of the volume we just created.
++ Create all your needed logical volumes on the volume group. We will create a `swap`, `root`, and `home` logical volumes. Note that the `volume` is the name of the volume we just created.
 
-+ Create our `swap`. I'll assign 1GB to it.
+	- Create our `swap`. I'll assign 1GB to it.
 
-	```
-	# lvcreate -L 1G volume -n swap
-	```
+		```
+		# lvcreate -L 1G volume -n swap
+		```
 
-	This will create `/dev/mapper/volume-swap`.
+		This will create `/dev/mapper/volume-swap`.
 
-+ Create our `root`. In this guide, I'll use 100GB.
+	- Create our `root`. In this guide, I'll use 100GB.
 
-	```
-	# lvcreate -L 100G volume -n root
-	```
+		```
+		# lvcreate -L 100G volume -n root
+		```
 
-	This will create `/dev/mapper/volume-root`.
+		This will create `/dev/mapper/volume-root`.
 
-+ Create our home sweet `home`. I'll just assign the remaining space to it.
+	- Create our home sweet `home`. I'll just assign the remaining space to it.
 
-	```
-	# lvcreate -l 100%FREE volume -n home
-	```
+		```
+		# lvcreate -l 100%FREE volume -n home
+		```
 
 	This will create `/dev/mapper/volume-home`.
 
-Format the logical partitions under the LVM volume.
++ Format the logical partitions under the LVM volume.
 
-+ Format and create our `swap`.
+	- Format and create our `swap`.
 
-	```
-	# mkswap /dev/mapper/volume-swap  
-	# swapon /dev/mapper/volume-swap
-	```
+		```
+		# mkswap /dev/mapper/volume-swap  
+		# swapon /dev/mapper/volume-swap
+		```
 
-+ Format our `root` and `home` partitions.
+	- Format our `root` and `home` partitions.
 
-	```
-	# mkfs.ext4 /dev/mapper/volume-root
-	# mkfs.ext4 /dev/mapper/volume-home
-	```
+		```
+		# mkfs.ext4 /dev/mapper/volume-root
+		# mkfs.ext4 /dev/mapper/volume-home
+		```
 
 ## Mount the filesystems
 
@@ -420,7 +420,7 @@ Format the logical partitions under the LVM volume.
 
 	 We don’t need to mount `swap` since it is already enabled.
 
-## Installing the base and linux packages
+## Installation
 
 Now let’s go ahead and install `base`, `linux`, `linux-firmware`, and `base-devel` packages into our system. 
 
