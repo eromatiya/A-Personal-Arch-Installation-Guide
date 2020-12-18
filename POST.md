@@ -22,7 +22,7 @@ We need to install a display server, a protocol or both. Normally, your desktop 
 # pacman -S xorg-server xorg-xrdb xorg-xinit xorg-xrandr xorg-xev xorg-xdpyinfo xorg-xprop
 ```
 
-If you're planning to use a window manager like `awesome`, `bspwm` or `i3`, you should install X. While if you're planning to use `sway`, then wayland it is. If `GNOME`, you can install both. Again, your environment of choice will automatically install these, as far as I know.
+If you're planning to use a window manager like `awesome`, `bspwm` or `i3`, you should install X. While if you're planning to use `sway`, then wayland it is. If `GNOME`, you can install both. Again, your environment of choice will automatically install these as its dependencies.
 
 #### Video Drivers
 
@@ -129,16 +129,16 @@ I'm an `awesome` and `KDE Plasma` guy, but right now I am using `Plasma`. So in 
 		# pacman -S packagekit-qt5
 		```
 
-	- Xorg is dying and nobody wants to maintain it anymore, while "Wayland is the future". I agree with this, although wayland needs to mature a little bit more to replace X completely. So yeah, I also want a Wayland session to test things:
+	- Xorg is dying and nobody wants to maintain it anymore, while "Wayland is the future". I agree with this, although wayland needs to mature a little bit more to replace X completely. So yeah, I also want a Wayland session to test things out:
 
 		```
 		# pacman -S qt5-wayland plasma-wayland-session
 		```
 
-	- For additional style plugins for Qt5, intall `qt5-styleplugins`:
+	- Some of the plasmoids uses `qdbus`, so also intall `qt5-tools` that will provide it:
 
 		```
-		# pacman -S qt5-styleplugins
+		# pacman -S qt5-tools
 		```
 
 	- I need a dock and I will be using `latte-dock` from the AUR:
@@ -565,7 +565,7 @@ $ reboot
 
 ## Extras
 
-#### Power Management
+#### Power Management for Laptops
 
 TLP brings you the benefits of advanced power management for Linux without the need to understand every technical detail. **This is for laptops.**
 
@@ -617,9 +617,9 @@ Now, load the module:
 
 You should see that the fan level is "auto" by default, but you can echo a level command to the same file to control the fan speed manually. The thinkfan daemon will do this automatically.
 
-**For Lenovox230 users**:
+**For Lenovo x230 users**:
 
-Open `/etc/thinkfan.conf`. Then use the following configuration: 
+Open or create `/etc/thinkfan.conf`. Then use the following configuration: 
 
 ```
 tp_fan /proc/acpi/ibm/fan
@@ -635,7 +635,7 @@ hwmon /sys/class/thermal/thermal_zone0/temp
 ("level full-speed", 63, 32767)
 ```
 
-To find the best thinkfan configuration for you, search it on the internet. I found mine on the ArchWiki. Maybe you can find yours too there.
+To find the best thinkfan configuration for you, search it on the internet. I found mine on the ArchWiki. Maybe you can find yours there too.
 
 **Make sure to have a configuration file before enabling the thinkfan service!** 
 
@@ -779,3 +779,4 @@ Create `/etc/fonts/local.conf`, then add:
 ```
 
 Update and set your font of choice on settings.
+

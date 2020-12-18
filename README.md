@@ -765,3 +765,5 @@ Finally, `reboot`.
 ##  Finale
 
 If your installation is a success, then ***yay!!!*** If not, you should start questioning your own existence. Are your parents proud of you? 
+
+## [POST INSTALLATION](./POST.md)		[EXTRAS](./EXTRAS.md)
