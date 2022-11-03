@@ -580,7 +580,7 @@ Creating a new initramfs is usually not required, because mkinitcpio was run on 
 		Find the `HOOKS` array, then change it to something like this:
 
 		```
-		HOOKS=(base systemd autodetect keyboard sd-vconsole modconf block sd-encrypt sd-lvm2 filesystems fsck)
+		HOOKS=(base systemd autodetect keyboard sd-vconsole modconf block sd-encrypt lvm2 filesystems fsck)
 		```
 
 	- Regenerate initramfs image:
