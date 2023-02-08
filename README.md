@@ -147,14 +147,6 @@ In this guide, I'll create a two different ways to partition a drive. One for a 
 	- Set name to `boot`. Hit enter.
 	- Now you should see the new partition in the partitions list with a partition type of EFI System and a partition name of boot. You will also notice there is 1007KB above the created partition. That is the MBR. Don’t worry about that and just leave it there.
 
-+ Create the `swap` partition
-
-	- Hit New again from the options at the bottom of partition list.
-	- Just hit enter to select the default option for the first sector.
-	- For the swap partition size, I always assign mine with 1GiB. Hit enter.
-	- Set GUID to `8200`. Hit enter.
-	- Set name to `swap`. Hit enter.
-
 + Create the `root` partition
 
 	- Hit New again.
@@ -193,6 +185,15 @@ In this guide, I'll create a two different ways to partition a drive. One for a 
 
 	Now we should be presented with our main drive showing the partition number, partition size, partition type, and partition name. If you see list of partitions, delete all those first.
 
++ Create the `boot` partition
+
+	- Hit New from the options at the bottom.
+	- Just hit enter to select the default option for the first sector.
+	- Now the partion size - Arch wiki recommends 200-300 MB for the boot + size. Let’s make 1GiB in case we need to add more OS to our machine. I’m gonna assign mine with 1024MiB. Hit enter.
+	- Set GUID to `EF00`. Hit enter.
+	- Set name to `boot`. Hit enter.
+	- Now you should see the new partition in the partitions list with a partition type of EFI System and a partition name of boot.
+
 + Create the `LVM` partition
 
 	- Hit New again.
@@ -222,13 +223,11 @@ You should see *something like this*:
 | sda1 | 8:1 | 0 | 1 | 0 | part |   |
 | sda2 | 8:2 | 0 | 1 | 0 | part |   |
 | sda3 | 8:3 | 0 | 175G | 0 | part |   |
-| sda4 | 8:4 | 0 | 300G | 0 | part |   |
 
 **`sda`** is the main disk  
 **`sda1`** is the boot partition  
 **`sda2`** is the swap partition  
 **`sda3`** is the home partition  
-**`sda4`** is the root partition
 
 ### Encrypted filesystem
 
@@ -252,13 +251,6 @@ You should see *something like this*:
 
 	```
 	# mkfs.fat -F32 /dev/sda1
-	```
-
-+ Create and enable our `swap` under the `/dev/sda2` partition.
-
-	```
-	# mkswap /dev/sda2
-	# swapon /dev/sda2
 	```
 
 + Format `/dev/sda3` and `/dev/sda4` partition as `EXT4`. This will be our `root` and `home`  partition.
@@ -310,14 +302,6 @@ You should see *something like this*:
 
 + Create all your needed logical volumes on the volume group. We will create a `swap`, `root`, and `home` logical volumes. Note that the `volume` is the name of the volume we just created.
 
-	- Create our `swap`. I'll assign 1GB to it.
-
-		```
-		# lvcreate -L 1G volume -n swap
-		```
-
-		This will create `/dev/mapper/volume-swap`.
-
 	- Create our `root`. In this guide, I'll use 100GB.
 
 		```
@@ -335,13 +319,6 @@ You should see *something like this*:
 	This will create `/dev/mapper/volume-home`.
 
 + Format the logical partitions under the LVM volume.
-
-	- Format and create our `swap`.
-
-		```
-		# mkswap /dev/mapper/volume-swap  
-		# swapon /dev/mapper/volume-swap
-		```
 
 	- Format our `root` and `home` partitions.
 
@@ -589,6 +566,33 @@ Creating a new initramfs is usually not required, because mkinitcpio was run on 
 		# mkinitcpio -p linux
 		```
 
+### Making Swap File
+
+Time to create a swap file! I'll make a gigabyte swap file.
+```
+# dd if=/dev/zero of=/swapfile bs=1M count=1024 status=progress
+```
+
+Set the right permissions
+```
+# chmod 0600 /swapfile
+```
+
+After creating the correctly sized file, format it to swap:
+```
+# mkswap -U clear /swapfile
+```
+
+Activate the swap file
+```
+# swapon /swapfile
+```
+
+Finally, edit the fstab configuration to add an entry for the swap file in `/etc/fstab`:
+```
+/swapfile none swap defaults 0 0
+```
+
 ## Adding Repositories - `multilib` and `AUR`
 
 Enable multilib and AUR repositories in `/etc/pacman.conf`. Open it with your editor of choice:
@@ -612,17 +616,18 @@ SigLevel = Never
 Server = http://repo.archlinux.fr/$arch
 ```
 
-### `pacman` easter eggs
+### `pacman` goodies
 
-You can enable the "easter-eggs" in `pacman`, the package manager of archlinux.
+You can enable the "easter-eggs" and goodies in `pacman`, the package manager of archlinux.
 
 Open `/etc/pacman.conf`, then find `# Misc options`. 
 
-To add colors to `pacman`, uncomment `Color`. Then add `Pac-Man` to `pacman` by adding `ILoveCandy` under the `Color` string:
+To add colors to `pacman`, uncomment `Color`. Then add `Pac-Man` to `pacman` by adding `ILoveCandy` under the `Color` string. To enable parallel downloads, uncomment it too:
 
 ```
 Color
 ILoveCandy
+ParallelDownloads
 ```
 
 ### Update repositories and packages
