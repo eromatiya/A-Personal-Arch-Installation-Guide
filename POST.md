@@ -48,7 +48,7 @@ MODULES=(i915 ...)
 #### Audio Drivers
 
 ```
-# pacman -S alsa-utils pulseaudio-alsa pulseaudio-bluetooth pulseaudio pavucontrol
+# pacman -S pipewire lib32-pipewire wireplumber pipewire-audio pipewire-pulse
 ```
 
 #### File System Tools
