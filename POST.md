@@ -324,43 +324,6 @@ Blueman automatically enables Bluetooth adapter when certain events (on boot, la
 $ gsettings set org.blueman.plugins.powermanager auto-power-on false
 ```
 
-#### Microcode
-
-Processor manufacturers release stability and security updates to the processor microcode. These updates provide bug fixes that can be critical to the stability of your system. Without them, you may experience spurious crashes or unexpected system halts that can be difficult to track down. 
-
-Install microcode.
-
-For AMD processors:
-
-```
-# pacman -S amd-ucode
-```
-
-For Intel processors:
-
-```
-# pacman -S intel-ucode
-```
-
-If your Arch installation is on a removable drive that needs to have microcode for both manufacturer processors, install both packages. 
-
-Load  microcode. For `systemd-boot`, use the `initrd` option to load the microcode, **before** the initial ramdisk, as follows:
-
-```
-# sudoedit /boot/loader/entries/entry.conf
-```
-
-```
-title   Arch Linux
-linux   /vmlinuz-linux
-initrd  /CPU_MANUFACTURER-ucode.img
-initrd  /initramfs-linux.img
-...
-```
-
-Change `CPU_MANUFACTURER` with either `amd` or `intel` depending on your processor.
-
-
 #### Plymouth
 
 Plymouth provides a flicker-free graphical boot process. In short, a splash screen.
@@ -622,25 +585,35 @@ You should see that the fan level is "auto" by default, but you can echo a level
 Open or create `/etc/thinkfan.conf`. Then use the following configuration: 
 
 ```
-tp_fan /proc/acpi/ibm/fan
-hwmon /sys/class/thermal/thermal_zone0/temp
+sensors:
+  - hwmon: /sys/devices/virtual/thermal/thermal_zone0/temp
 
-(0, 0,  60)
-(1, 53, 65)
-(2, 55, 66)
-(3, 57, 68)
-(4, 61, 70)
-(5, 64, 71)
-(7, 68, 32767)
-("level full-speed", 63, 32767)
+fans:
+  - tpacpi: /proc/acpi/ibm/fan
+
+levels:
+  - [0, 0, 60]
+  - [1, 53, 65]
+  - [2, 55, 66]
+  - [3, 57, 68]
+  - [4, 61, 70]
+  - [5, 64, 71]
+  - [7, 68, 75]
+  - ["level full-speed", 72, 32767]
 ```
 
-To find the best thinkfan configuration for you, search it on the internet. I found mine on the ArchWiki. Maybe you can find yours there too.
+To find the best thinkfan configuration for you, search it on the internet.
 
 **Make sure to have a configuration file before enabling the thinkfan service!** 
 
 ```
 # systemctl enable thinkfan.service
+```
+
+If you encounter an error about missing module, add this to your kernel parameters:
+
+```
+options thinkpad_acpi.fan_control=1
 ```
 
 #### Enable MAC randomization

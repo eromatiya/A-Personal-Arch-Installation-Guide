@@ -300,7 +300,7 @@ You should see *something like this*:
 	# vgcreate volume /dev/mapper/cryptlvm
 	```
 
-+ Create all your needed logical volumes on the volume group. We will create a `swap`, `root`, and `home` logical volumes. Note that the `volume` is the name of the volume we just created.
++ Create all your needed logical volumes on the volume group. We will create `root` and `home` logical volumes. Note that the `volume` is the name of the volume we just created.
 
 	- Create our `root`. In this guide, I'll use 100GB.
 
@@ -361,8 +361,6 @@ You should see *something like this*:
 	# mount /dev/sda1 /mnt/home
 	```
 
-	We don’t need to mount `swap` since it is already enabled.  
-
 ### Encrypted partition
 
 + Mount the `/dev/mapper/volume-root` partition to `/mnt`. This is our `/`:
@@ -402,10 +400,50 @@ You should see *something like this*:
 Now let’s go ahead and install `base`, `linux`, `linux-firmware`, and `base-devel` packages into our system. 
 
 ```
-# pacstrap /mnt base base-devel linux linux-firmware
+# pacstrap /mnt base base-devel linux linux-zen linux-firmware
 ```
 
+I will install `linux-zen` since it has necessary modules for gaming.
+
 The `base` package does not include all tools from the live installation, so installing other packages may be necessary for a fully functional base system. In particular, consider installing: 
+
++ software necessary for networking,
+
+	- `dhcpcd`: RFC2131 compliant DHCP client daemon
+	- `iwd`: Internet Wireless Daemon
+	- `inetutils`: A collection of common network programs
+	- `iputils`: Network monitoring tools, including `ping`
+
++ utilities for accessing `RAID` or `LVM` partitions,
+
+	- `lvm2`: Logical Volume Manager 2 utilities (*if you are setting up an encrypted filesystem with LUKS/LVM, include this on pacstrap*)
+
++ Zram
+
+	- `zram-generator`
+
++ a text editor(s),
+
+	- `nano`
+	- `vim`
+	- `vi`
+
++ packages for accessing documentation in man and info pages,
+
+	- `man-db`
+	- `man-pages`
+
++ Microcode
+
+	- `intel-ucode`/`amd-ucode`
+
++ tools:
+
+	- `git`: the fast distributed version control system
+	- `tmux`: A terminal multiplexer
+	- `less`: A terminal based program for viewing text files
+	- `usbutils`: USB Device Utilities
+	- `bash-completion`: Programmable completion for the bash shell
 
 + userspace utilities for the management of file systems that will be used on the system,
 	
@@ -419,38 +457,6 @@ The `base` package does not include all tools from the live installation, so ins
 	- `android-udev`: Udev rules to connect Android devices to your linux box
 	- `mtpfs`: A FUSE filesystem that supports reading and writing from any MTP devic
 	- `xdg-user-dirs`: Manage user directories like `~/Desktop` and `~/Music`
-
-+ utilities for accessing `RAID` or `LVM` partitions,
-
-	- `lvm2`: Logical Volume Manager 2 utilities (*if you are setting up an encrypted filesystem with LUKS/LVM, include this on pacstrap*)
-
-+ specific firmware for other devices not included in `linux-firmware`,
-	
-+ software necessary for networking,
-
-	- `dhcpcd`: RFC2131 compliant DHCP client daemon
-	- `iwd`: Internet Wireless Daemon
-	- `inetutils`: A collection of common network programs
-	- `iputils`: Network monitoring tools, including `ping`
-
-+ a text editor(s),
-
-	- `nano`
-	- `vim`
-	- `vi`
-
-+ packages for accessing documentation in man and info pages,
-
-	- `man-db`
-	- `man-pages`
-
-+ and more useful tools:
-
-	- `git`: the fast distributed version control system
-	- `tmux`: A terminal multiplexer
-	- `less`: A terminal based program for viewing text files
-	- `usbutils`: USB Device Utilities
-	- `bash-completion`: Programmable completion for the bash shell
 
 These tools will be useful later. So **future me**, install these.
 
@@ -535,8 +541,10 @@ Creating a new initramfs is usually not required, because mkinitcpio was run on 
 ### Unencrypted filesystem
 
 	```
-	# mkinitcpio -p linux
+	# mkinitcpio -P
 	```
+
+	DO NOT FORGET TO RUN THIS BEFORE REBOOTING YOUR SYSTEM!
 
 ### Encrypted filesystem with LVM/LUKS
 
@@ -563,14 +571,17 @@ Creating a new initramfs is usually not required, because mkinitcpio was run on 
 	- Regenerate initramfs image:
 
 		```
-		# mkinitcpio -p linux
+		# mkinitcpio -P
 		```
 
-### Making Swap File
+		DO NOT FORGET TO RUN THIS BEFORE REBOOTING YOUR SYSTEM!
 
-Time to create a swap file! I'll make a gigabyte swap file.
+### Making Swap File and ZSwap
+
+#### Time to create a swap file! I'll make two gigabytes swap file.
+
 ```
-# dd if=/dev/zero of=/swapfile bs=1M count=1024 status=progress
+# dd if=/dev/zero of=/swapfile bs=1M count=2048 status=progress
 ```
 
 Set the right permissions
@@ -590,8 +601,41 @@ Activate the swap file
 
 Finally, edit the fstab configuration to add an entry for the swap file in `/etc/fstab`:
 ```
-/swapfile none swap defaults 0 0
+/swapfile none swap defaults,pri=10 0 0
 ```
+
+#### Install zram-generator:
+
+```
+# pacman -S zram-generator
+```
+
+Let's make a config file at `/etc/systemd/zram-generator.conf
+!` I prefer having HALF of my TOTAL RAM as zswap size. My laptop have 4 cores, so I'll distribute it to FOUR zram devices. So I'll uthis config :
+
+```
+[zram0]
+zram-size = ram/8
+compression-algorithm = zstd
+swap-priority = 100
+
+[zram1]
+zram-size = ram/8
+compression-algorithm = zstd
+swap-priority = 100
+
+[zram2]
+zram-size = ram/8
+compression-algorithm = zstd
+swap-priority = 100
+
+[zram3]
+zram-size = ram/8
+compression-algorithm = zstd
+swap-priority = 100
+```
+
+No need to enable/start anything, it will automatically initialize zram devices! Just reboot and run `swapon -s` to check the swap you have.
 
 ## Adding Repositories - `multilib` and `AUR`
 
@@ -627,7 +671,7 @@ To add colors to `pacman`, uncomment `Color`. Then add `Pac-Man` to `pacman` by 
 ```
 Color
 ILoveCandy
-ParallelDownloads
+ParallelDownloads = 3
 ```
 
 ### Update repositories and packages
@@ -752,6 +796,42 @@ timeout 0
 console-mode max
 editor no
 ```
+
+#### Microcode
+
+Processor manufacturers release stability and security updates to the processor microcode. These updates provide bug fixes that can be critical to the stability of your system. Without them, you may experience spurious crashes or unexpected system halts that can be difficult to track down. 
+
+If you didn't install it using pacstrap, install microcode by:
+
+For AMD processors:
+
+```
+# pacman -S amd-ucode
+```
+
+For Intel processors:
+
+```
+# pacman -S intel-ucode
+```
+
+If your Arch installation is on a removable drive that needs to have microcode for both manufacturer processors, install both packages. 
+
+Load  microcode. For `systemd-boot`, use the `initrd` option to load the microcode, **before** the initial ramdisk, as follows:
+
+```
+# sudoedit /boot/loader/entries/entry.conf
+```
+
+```
+title   Arch Linux
+linux   /vmlinuz-linux
+initrd  /CPU_MANUFACTURER-ucode.img
+initrd  /initramfs-linux.img
+...
+```
+
+Replace `CPU_MANUFACTURER` with either `amd` or `intel` depending on your processor.
 
 ## Enable internet connection for the next boot
 
