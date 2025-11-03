@@ -108,7 +108,7 @@ I'm an `awesome` and `KDE Plasma` guy, but right now I am using `Plasma`. So in 
 	- Install the `plasma-meta` meta-package or the `plasma` group. For differences between `plasma-meta` and `plasma` reference Package group. Alternatively, for a more minimal Plasma installation, install the `plasma-desktop` package. Although I always install `plasma-desktop`, `plasma-meta` and some other programs such as `libappindicator-gtk3`, `libappindicator-gtk2`, `packagekit-qt5`, and etc.
 
 		```
-		# pacman -S plasma-desktop plasma-meta
+		# pacman -S plasma-desktop plasma-browser-integration plasma-disks plasma-firewall plasma-integration plasma-nm plasma-pa plasma-systemmonitor powerdevil breeze-gtk kactivitymanagerd kdecoration kdeplasma-addons kinfocenter knighttime kpipewire kscreen krdp ksystemstats print-manager polkit-kde-agent ufw plasma-browser-integration plasma-disks plasma-firewall plasma-integration plasma-nm plasma-pa plasma-systemmonitor powerdevil breeze-gtk kactivitymanagerd kdecoration kdeplasma-addons kinfocenter knighttime kpipewire kscreen krdp ksystemstats print-manager polkit-kde-agent ufw
 		```
 
 	- KDE Plasma provides a global menu, to have a better integration with `GTK` programs, install `appmenu-gtk-module`:
@@ -120,13 +120,13 @@ I'm an `awesome` and `KDE Plasma` guy, but right now I am using `Plasma`. So in 
 	- If some programs like `Discord` has a blurry icon in the system tray, install the libappindicators:
 
 		```
-		# pacman -S libappindicator-gtk3 libappindicator-gtk2
+		# pacman -S libappindicator
 		```
 
 	- `Discover` is the Plasma's app store, it will be automatically installed by installing the `plasma-meta` package. If it doesn't show any applications, install `packagekit-qt5`:
 
 		```
-		# pacman -S packagekit-qt5
+		# pacman -S packagekit-qt6
 		```
 
 	- Xorg is dying and nobody wants to maintain it anymore, while "Wayland is the future". I agree with this, although wayland needs to mature a little bit more to replace X completely. So yeah, I also want a Wayland session to test things out:
