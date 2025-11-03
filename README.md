@@ -114,6 +114,8 @@ When recognized by the live system, disks are assigned to a block device such as
 # lsblk
 ```
 
+## IMPORTANT: MAKE SURE TO CHOOSE THE CORRECT DRIVE TO FORMAT!!! 
+
 Results ending in `rom`, `loop` or `airoot` may be ignored.
 
 In this guide, I'll create a two different ways to partition a drive. One for a normal installation, the other one is setting up with an encryption(LUKS/LVM). Let's start with the unecrypted one:
@@ -155,7 +157,7 @@ In this guide, I'll create a two different ways to partition a drive. One for a 
 	- Also hit enter for the GUID to select default(`8300`).
 	- Then set name of the partition to `root`.
 
-+ Create the `root` partition
++ Create the `home` partition
 
 	- Hit New again.
 	- Hit enter to select the default option for the first sector.
