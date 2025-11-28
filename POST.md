@@ -773,3 +773,12 @@ ACTION=="add|change", KERNEL=="sd[a-z]*|mmcblk[0-9]*", ATTR{queue/rotational}=="
 ACTION=="add|change", KERNEL=="nvme[0-9]*", ATTR{queue/rotational}=="0", \
     ATTR{queue/scheduler}="none"
 ```
+
+
+```
+$  udevadm control --reload-rules
+$  udevadm trigger
+
+$  cat /sys/block/nvme0n1/queue/scheduler # check output
+$  cat /sys/block/sda/queue/scheduler    
+```
