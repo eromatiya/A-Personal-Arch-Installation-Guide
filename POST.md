@@ -14,41 +14,31 @@ It's recommended to check for updates first before installing anything so:
 # pacman -Syu
 ```
 
-### Display Server and Protocol
-
-We need to install a display server, a protocol or both. Normally, your desktop environment or window manager of choice will automatically install these as a dependency. But for this guide's sake we will install `X` server:
-
-```
-# pacman -S xorg-server xorg-xrdb xorg-xinit xorg-xrandr xorg-xev xorg-xdpyinfo xorg-xprop
-```
-
-If you're planning to use a window manager like `awesome`, `bspwm` or `i3`, you should install X. While if you're planning to use `sway`, then wayland it is. If `GNOME`, you can install both. Again, your environment of choice will automatically install these as its dependencies.
+### Drivers
 
 #### Video Drivers
 
-After installing the graphical server, we need to install the video drivers. I'm only using an integrated intel graphics card. **Sobs.** So an intel driver is what I need.
-
-
+For AMD:
 ```
-# pacman -S xf86-video-intel vulkan-intel vulkan-icd-loader libva-intel-driver
+# pacman -S mesa lib32-mesa vulkan-radeon lib32-vulkan-radeon libva-mesa-driver libva-utils
 ```
 
-Add your (kernel) graphics driver to your initramfs. For example, if using `intel` add `i915`: 
+Add your (kernel) graphics driver to your initramfs. For example, if using `intel` add `i915` or if using `amd` add `amdgpu`: 
 
 ```
 # sudoedit /etc/mkinitcpio.conf
 ```
 
-Then add `i915` to the `MODULES`:
+Then add `amdgpu` to the `MODULES`:
 
 ```
-MODULES=(i915 ...)
+MODULES=(amdgpu ...)
 ```
 
 #### Audio Drivers
 
 ```
-# pacman -S pipewire lib32-pipewire wireplumber pipewire-audio pipewire-pulse
+# pacman -S pipewire lib32-pipewire wireplumber pipewire-audio pipewire-pulse pipewire-jack pipewire-session-manager
 ```
 
 #### File System Tools
@@ -65,7 +55,6 @@ android-udev mtpfs xdg-user-dirs
 ```
 # xdg-user-dirs-update
 ```
-
 
 #### Git
 
@@ -87,28 +76,19 @@ $ cd yay-bin/
 $ makepkg -sri
 ```
 
-#### Missing Kernel Modules
-
-If you noticed, there's a warning message while running `mkinitcpio -p linux`, fix this by installing these firmwares:
-
-```
-$ yay -S wd719x-firmware aic94xx-firmware --removemake --noconfirm
-# mkinitcpio -p linux
-```
-
-
 #### Desktop Environment and Window Manager
 
 Install your preferred desktop environment or window manager. 
 
-I'm an `awesome` and `KDE Plasma` guy, but right now I am using `Plasma`. So in this guide, I'll include a guide to set-up both `Plasma` and `Awesome`.
+I'm a `KDE Plasma` guy, so in this guide, I'll include a guide to set-up `Plasma`.
 
 + KDE Plasma
 
-	- Install the `plasma-meta` meta-package or the `plasma` group. For differences between `plasma-meta` and `plasma` reference Package group. Alternatively, for a more minimal Plasma installation, install the `plasma-desktop` package. Although I always install `plasma-desktop`, `plasma-meta` and some other programs such as `libappindicator-gtk3`, `libappindicator-gtk2`, `packagekit-qt5`, and etc.
+	- Install the `plasma` then uninstall `discover`.
 
 		```
-		# pacman -S plasma-desktop plasma-browser-integration plasma-disks plasma-firewall plasma-integration plasma-nm plasma-pa plasma-systemmonitor powerdevil breeze-gtk kactivitymanagerd kdecoration kdeplasma-addons kinfocenter knighttime kpipewire kscreen krdp ksystemstats print-manager polkit-kde-agent ufw plasma-browser-integration plasma-disks plasma-firewall plasma-integration plasma-nm plasma-pa plasma-systemmonitor powerdevil breeze-gtk kactivitymanagerd kdecoration kdeplasma-addons kinfocenter knighttime kpipewire kscreen krdp ksystemstats print-manager polkit-kde-agent ufw
+		# pacman -S plasma
+		# pacman -R discover
 		```
 
 	- KDE Plasma provides a global menu, to have a better integration with `GTK` programs, install `appmenu-gtk-module`:
@@ -123,89 +103,13 @@ I'm an `awesome` and `KDE Plasma` guy, but right now I am using `Plasma`. So in 
 		# pacman -S libappindicator
 		```
 
-	- `Discover` is the Plasma's app store, it will be automatically installed by installing the `plasma-meta` package. If it doesn't show any applications, install `packagekit-qt5`:
+  - To make consistent file dialog under KDE Plasma, install:
 
 		```
-		# pacman -S packagekit-qt6
+		# pacman -S xdg-desktop-portal xdg-desktop-portal-kde
 		```
 
-	- Xorg is dying and nobody wants to maintain it anymore, while "Wayland is the future". I agree with this, although wayland needs to mature a little bit more to replace X completely. So yeah, I also want a Wayland session to test things out:
-
-		```
-		# pacman -S qt5-wayland plasma-wayland-session
-		```
-
-	- Some of the plasmoids uses `qdbus`, so also intall `qt5-tools` that will provide it:
-
-		```
-		# pacman -S qt5-tools
-		```
-
-	- I need a dock and I will be using `latte-dock` from the AUR:
-
-		```
-		$ yay -S latte-dock-git
-		```
-
-+ Awesome Window Manager
-
-	- I always use the latest version of `awesomewm` because the devs are doing an amazing job by maintaining this treasure of a program and I also want to get the latest fixes and features ASAP (one of the reason I use arch btw). So install it from the AUR:
-
-		```
-		$ yay -S awesome-git --noconfirm --removemake
-		```
-
-	- Of course, just a window manager is not enough to get the experience I want. So I need to install a compositor and some utilities to achieve it.
-
-		- I will be using `light` as the backlight control tool:
-
-			```
-			$ yay -S light-git
-			```
-
-		- Picom as the compositor:
-
-			```
-			$ yay -S picom-git --noconfirm --removemake
-			```
-
-		- Rofi as the application launcher:
-
-			```
-			# pacman -S rofi
-			```
-
-		- Authentication Managers
-
-			Polkit is used for controlling system-wide privileges. It provides an organized way for non-privileged processes to communicate with privileged ones. In contrast to systems such as sudo, it does not grant root permission to an entire process, but rather allows a finer level of control of centralized system policy.
-
-			+ Install `polkit-kde-agent`/`lxqt-policykit`/`polkit-gnome`, and `gnome-keyring`:
-
-				I'm using Qt apps with awesome, so I'll install lxqt-policykit for UI consistency. Note that you only need one authentication manager and gnome-keyring.
-
-				```
-				# pacman -S polkit lxqt-policykit gnome-keyring
-				```
-
-			+ Run it:
-
-				For lxqt-policykit, run:
-
-				```
-				$ /usr/bin/lxqt-policykit-agent
-				```
-
-				For polkit-kde-agent, run:
-
-				```
-				$ /usr/lib/polkit-kde-authentication-agent-1
-				```
-
-				For polkit-gnome:
-
-				```
-				$ /usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1
-				```
+        Set the environment variable `GTK_USE_PORTAL=1` and `GDK_DEBUG=portals` in `/etc/environment`.
 
 #### Terminal Emulator
 
@@ -216,32 +120,8 @@ After installing an environment, we need a terminal emulator. Every linux user's
 	`Konsole` is the best terminal emulator for KDE Plasma due to its integration to the environment. While `yakuake` will be our drop-down terminal.
 
 	```
-	# pacman -S konsole yakuake
+	# pacman -S konsole
 	```
-
-+ Awesome Window Manager
-
-	For me, `kitty` is the best terminal emulator for my awesome wm setups as it's easy to configure and *fast*. I will also install `xterm` as a backup emulator.
-	
-	```
-	# pacman -S kitty xterm
-	```
-
-#### GTK
-
-GTK, or the GIMP Toolkit, is a multi-platform toolkit for creating graphical user interfaces.
-
-If not yet installed:
-
-```
-# pacman -S gtk3
-```
-
-Install GTK engines
-
-```
-# pacman -S gtk-engine-murrine gtk-engines gnome-theme-extra
-```
 
 #### File Managers
 
@@ -269,7 +149,6 @@ ffmpegthumbs raw-thumbnailer taglib
 Enable preview showing of required file type in *Settings > Configure Dolphin... > General > Previews*.
 
 There's a lot more thumbnail generators that can be found from the AUR (like a generator to create a thumbnail for `APK` files), but I don't really use them.
-
 
 #### GUI-based Text Editors
 
