@@ -23,7 +23,7 @@ For AMD:
 # pacman -S mesa lib32-mesa vulkan-radeon lib32-vulkan-radeon libva-mesa-driver libva-utils
 ```
 
-Add your (kernel) graphics driver to your initramfs. For example, if using `intel` add `i915` or if using `amd` add `amdgpu`: 
+Add your (kernel) graphics driver to your initramfs. For example, if using `intel` add `i915` or if using `amd` add `amdgpu`:
 
 ```
 # sudoedit /etc/mkinitcpio.conf
@@ -37,6 +37,8 @@ MODULES=(amdgpu ...)
 
 #### Audio Drivers
 
+Usually don't have to install these if you are going to install a desktop environment like KDE. It will automatically install what is needed.
+
 ```
 # pacman -S pipewire lib32-pipewire wireplumber pipewire-audio pipewire-pulse pipewire-jack pipewire-session-manager
 ```
@@ -46,7 +48,7 @@ MODULES=(amdgpu ...)
 File system tools
 
 ```
-# pacman -S unrar unzip p7zip unarchiver gvfs-mtp libmtp ntfs-3g \
+# pacman -S unrar unzip p7zip unarchiver gvfs-mtp libmtp \
 android-udev mtpfs xdg-user-dirs
 ```
 
@@ -78,7 +80,7 @@ $ makepkg -sri
 
 #### Desktop Environment and Window Manager
 
-Install your preferred desktop environment or window manager. 
+Install your preferred desktop environment or window manager.
 
 I'm a `KDE Plasma` guy, so in this guide, I'll include a guide to set-up `Plasma`.
 
@@ -128,22 +130,23 @@ After installing an environment, we need a terminal emulator. Every linux user's
 KDE's `dolphin` is the best file manager in the Linux world, imho. So I always use this no matter what environment I'm using. We will also install `ranger`, a CLI-based file manager.
 
 ```
-# pacman -S dolphin dolphin-plugins kde-cli-tools ranger
+# pacman -S dolphin dolphin-plugins kio-admin kde-cli-tools ranger
 ```
 
 To generate thumbnails, I'll also install these:
 
 + kdegraphics-thumbnailers: Image files and PDFs
 + kimageformats: Gimp `.xcf` files
-+ qt5-imageformats : `.webp`, `.tiff`, `.tga`, `.jp2` files
++ qt6-imageformats : `.webp`, `.tiff`, `.tga`, `.jp2` files
 + kdesdk-thumbnailers: Plugins for the thumbnailing system
 + ffmpegthumbs: Video files (based on ffmpeg)
-+ raw-thumbnailer: `.raw` files
 + taglib : Audio files
++ icoutils : *.ico, *.cur files and embedded *.exe icons
++ libappimage (with kio-extras also installed): embedded *.AppImage icons
 
 ```
-# pacman -S kdegraphics-thumbnailers kimageformats qt5-imageformats kdesdk-thumbnailers \
-ffmpegthumbs raw-thumbnailer taglib
+# pacman -S kdegraphics-thumbnailers kimageformats qt6-imageformats kdesdk-thumbnailers \
+ffmpegthumbs taglib icoutils libappimage
 ```
 
 Enable preview showing of required file type in *Settings > Configure Dolphin... > General > Previews*.
@@ -152,10 +155,10 @@ There's a lot more thumbnail generators that can be found from the AUR (like a g
 
 #### GUI-based Text Editors
 
-`vim` is my text editor of choice, but sublime Text 3 is my go-to GUI text editor as it's lighter than the ~~bloated~~ chromium-based counterparts like `atom` and `vscode`.
+`vim` is my text editor of choice, but sublime Text 4 is my go-to GUI text editor as it's lighter than the chromium-based counterparts like `atom` and `vscode`.
 
 ```
-$ yay -S sublime-text-dev
+$ yay -S sublime-text-4
 ```
 
 Note that Sublime is not "free" and needs a license.
@@ -176,7 +179,7 @@ $ yay -S google-chrome
 
 #### Bluetooth
 
-If you're using KDE Plasma, you don't need to do these:
+If you're using KDE Plasma, skip this step:
 
 ```
 # pacman -S bluez
@@ -210,35 +213,23 @@ Plymouth provides a flicker-free graphical boot process. In short, a splash scre
 1. Install plymouth.
 
 	```
-	$ yay -S plymouth
+	# pacman -S plymouth
 	```
 
-2. Add `plymouth` to the HOOKS array in mkinitcpio.conf. It must be added **after** `base` and `udev`/`systemd` for it to work: 
+2. Add `plymouth` to the HOOKS array in mkinitcpio.conf. It must be added **after** `base` and `udev`/`systemd` for it to work:
 
 	```
 	# sudoedit /etc/mkinitcpio.conf
 	```
 
-	- Unencrypted partition
+	Add `plymouth` after base and systemd:
 
-		Put `plymouth` after base and udev:
-
-		```
-		HOOKS=(base udev plymouth ...)
-		```
-
-	- Encrypted partition **and** `systemd`-based initramfs.
-
-		Again, you need a `systemd`-based initramfs for the `plymouth` HOOK to work.
-
-		Put `sd-plymouth` after the `base` and `systemd` hooks:
-
-		```
-		HOOKS=(base systemd sd-plymouth ...)
-		```
+	```
+	HOOKS=(base systemd plymouth ...)
+	```
 
 3. Set the theme.
-	
+
 	List all the installed plymouth theme:
 
 	```
@@ -260,7 +251,7 @@ Plymouth provides a flicker-free graphical boot process. In short, a splash scre
 	Replace `arch10` with your choice.
 
 4. You now need to append `splash` in the kernel parameters in your boot entry options.
-	
+
 	```
 	# sudoedit /boot/loader/enable/arch.conf
 	```
@@ -282,63 +273,14 @@ A display manager, or login manager, is typically a graphical user interface tha
 
 + KDE Plasma
 
-	The `plasma-meta` package will include and install `sddm`. So there's no need to install one. Enable it by:
-
-	If you installed and using `plymouth`, enable this to have a smooth transition:
-
 	```
-	# systemctl enable sddm-plymouth
+	# pacman -S plasma-login-manager
+	# systemctl enable plasmalogin.service
 	```
-
-	If not:
-
-	```
-	# systemctl enable sddm
-	```	
-
-+ Awesome Window Manager
-
-	I'm using `lightdm` with `lightdm-webkit2-greeter`, so this guide will cover that. 
-
-	- First, install it:
-
-		```
-		# pacman -S lightdm lightdm-webkit2-greeter
-		```
-
-	- To enable graphical login, enable the appropriate systemd service. For example, for Lightdn, enable `lightdm.service`. Just because we're using plymouth, we will enable `lightdm-plymouth.service` to have a smooth transition from plymouth to lightdm.
-
-		```
-		# systemctl enable lightdm-plymouth
-		```
-
-	- Install a theme. I create my own lightdm-webkit2 theme and it's called [glorious](https://github.com/manilarome/lightdm-webkit2-theme-glorious).
-
-		```
-		$ yay -S lightdm-webkit2-theme-glorious
-		```
-
-	- Configure the lightdm to use lightdm-webkit2-greeter by:
-
-		+ Set lightdm greeter session to webkit2.
-
-			```
-			# sudoedit /etc/lightdm/lightdm.conf
-			```
-
-			Find `greeter-session` under the `[Seat:*]` section, uncomment it, then set its value to `lightdm-webkit2-greeter`.
-
-		+ Set it as the lightdm-webkit2 theme then enable `debug_mode` by setting it to `true`. Why do we need to enable `debug_mode`? Sometimes you will be greeted by an error. And this error is due to a race condition where the theme is trying to access the `lightdm` object even though it doesn't exist *yet*. Debug mode will allow you to `right-click` and `reload` the greeter just like a webpage.
-
-			```
-			# sudoedit /etc/lightdm/lightdm-webkit2-greeter.conf
-			```
-
-			Find `webkit_theme` then set its value to `glorious`. Find `debug_mode` then set it to true. If you encountered an error, right-click then reload.
 
 #### Silent boot
 
-This is for who prefer to limit the verbosity of their system to a strict minimum, either for aesthetics or other reasons. For me, it's aesthetics. 
+This is for who prefer to limit the verbosity of their system to a strict minimum, either for aesthetics or other reasons. For me, it's aesthetics.
 
 Edit boot loader kernel parameters:
 
@@ -346,10 +288,10 @@ Edit boot loader kernel parameters:
 # sudoedit /boot/loader/entries/arch.conf
 ```
 
-Add these parameters `(options ... loglevel=3 vga=current rd.udev.log_priority=3 fbcon=nodefer ...)` in the `options`:
+On a new line add these parameters:
 
 ```
-options quiet loglevel=3 vga=current rd.udev.log_priority=3 fbcon=nodefer
+options quiet splash loglevel=3 rd.udev.log_priority=3 rd.systemd.show_status=auto rd.systemd.show_status=auto consoleblank=0
 ```
 
 If you're using `plymouth` and its `splash` kernel parameter, put `splash` after the `quiet` parameter.
@@ -386,7 +328,7 @@ As of now, we're using `iwd` if we're using wireless connection and `dhcpcd` if 
 		```
 
 	- `dhcpcd`
-	
+
 		```
 		# systemctl disable --now dhcpcd
 		```
@@ -399,7 +341,7 @@ As of now, we're using `iwd` if we're using wireless connection and `dhcpcd` if 
 
 #### Reboot then Login
 
-The system's fully functional! You can now login to you system with all the configuration we've done so far. 
+The system's fully functional! You can now login to you system with all the configuration we've done so far.
 
 ```
 $ reboot
@@ -430,111 +372,11 @@ Enable acpid
 # systemctl enable acpid.service
 ```
 
-#### Fan Control for Thinkpad
-
-**For thinkpad users**, install `thinkfan` here.
-
-```
-$ yay -S thinkfan
-```
-
-Note that the thinkfan package installs `/usr/lib/modprobe.d/thinkpad_acpi.conf`, which contains:
-
-```
-options thinkpad_acpi fan_control=1
-```
-
-So fan control is enabled by default. Alternatively, you can enable fan control as follows: 
-
-```
-# echo "options thinkpad_acpi fan_control=1" > /etc/modprobe.d/thinkfan.conf
-```
-
-Now, load the module: 
-
-```
-# modprobe thinkpad_acpi
-# cat /proc/acpi/ibm/fan
-```
-
-You should see that the fan level is "auto" by default, but you can echo a level command to the same file to control the fan speed manually. The thinkfan daemon will do this automatically.
-
-**For Lenovo x230 users**:
-
-Open or create `/etc/thinkfan.conf`. Then use the following configuration: 
-
-```
-sensors:
-  - hwmon: /sys/devices/virtual/thermal/thermal_zone0/temp
-
-fans:
-  - tpacpi: /proc/acpi/ibm/fan
-
-levels:
-  - [0, 0, 60]
-  - [1, 53, 65]
-  - [2, 55, 66]
-  - [3, 57, 68]
-  - [4, 61, 70]
-  - [5, 64, 71]
-  - [7, 68, 75]
-  - ["level full-speed", 72, 32767]
-```
-
-To find the best thinkfan configuration for you, search it on the internet.
-
-**Make sure to have a configuration file before enabling the thinkfan service!** 
-
-```
-# systemctl enable thinkfan.service
-```
-
-If you encounter an error about missing module, add this to your kernel parameters:
-
-```
-options thinkpad_acpi.fan_control=1
-```
-
-#### Enable MAC randomization
-
-MAC randomization can be used for increased privacy by not disclosing your real MAC address to the network. 
-
-+ Randomization for iwd
-
-	Create and edit `/etc/iwd/main.conf`. Then add the following lines:
-
-	```
-	[General]
-	AddressRandomization=once
-	AddressRandomizationRange=nic
-	```
-
-+ Randomization for network-manager
-
-	- Install macchanger.
-
-		```
-		# pacman -S macchanger
-		```
-
-	- Create `30-mac-randomization.conf` in your `/etc/NetworkManager/conf.d/`. Add this:
-
-		```
-		[device-mac-randomization]
-		# "yes" is already the default for scanning
-		wifi.scan-rand-mac-address=yes
-
-		[connection-mac-randomization]
-		ethernet.cloned-mac-address=random
-		wifi.cloned-mac-address=stable
-		```
-
-
 #### Firewall
 
 We'll use `Uncomplicated Firewall` or `ufw` for short.
 
-1. Install the `ufw` package. Start and enable `ufw.service` to make it available at boot. Note that this will not work if `iptables.service` is also enabled (and same for its ipv6 counterpart). 
+1. Install the `ufw` package. Start and enable `ufw.service` to make it available at boot. Note that this will not work if `iptables.service` is also enabled (and same for its ipv6 counterpart).
 
 	```
 	# pacman -S ufw
@@ -542,7 +384,7 @@ We'll use `Uncomplicated Firewall` or `ufw` for short.
 
 2. Configuration
 
-	Here's some basic configuration. A very simplistic configuration which will deny all by default, allow any protocol from inside a 192.168.0.1-192.168.0.255 LAN, and allow incoming Deluge and rate limited SSH traffic from anywhere: 
+	Here's some basic configuration. A very simplistic configuration which will deny all by default, allow any protocol from inside a 192.168.0.1-192.168.0.255 LAN, and allow incoming Deluge and rate limited SSH traffic from anywhere:
 
 	```
 	# ufw default deny
@@ -551,14 +393,16 @@ We'll use `Uncomplicated Firewall` or `ufw` for short.
 	# ufw limit ssh
 	```
 
-3. The next line is only needed once the first time you install the package: 
+	If you are going to use KDE Connect, make sure to configure UFW for it.
+
+3. The next line is only needed once the first time you install the package:
 
 	```
 	# ufw enable
 	# systemctl enable --now ufw.service
 	```
 
-Adding other applications. The PKG comes with some defaults based on the default ports of many common daemons and programs. Inspect the options by looking in the `/etc/ufw/applications.d` directory or by listing them in the program itself: 
+Adding other applications. The PKG comes with some defaults based on the default ports of many common daemons and programs. Inspect the options by looking in the `/etc/ufw/applications.d` directory or by listing them in the program itself:
 
 ```
 # ufw app list
@@ -659,5 +503,14 @@ $  udevadm control --reload-rules
 $  udevadm trigger
 
 $  cat /sys/block/nvme0n1/queue/scheduler # check output
-$  cat /sys/block/sda/queue/scheduler    
+$  cat /sys/block/sda/queue/scheduler
+```
+
+
+#### Enable SSD TRIM
+
+To keep SSDs fast and maintain cell health enable `fstrim.timer`:
+
+```
+# systemctl enable --now fstrim.timer
 ```
