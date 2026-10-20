@@ -20,7 +20,7 @@ The default console keymap is US. Available layouts can be listed with:
 # ls /usr/share/kbd/keymaps/**/*.map.gz
 ```
 
-To modify the layout, append a corresponding file name to loadkeys, omitting path and file extension. For example, to set a US keyboard layout:  
+To modify the layout, append a corresponding file name to loadkeys, omitting path and file extension. For example, to set a US keyboard layout:
 
 ```
 # loadkeys us
@@ -28,7 +28,7 @@ To modify the layout, append a corresponding file name to loadkeys, omitting pat
 
 ## Verify the boot mode
 
-If UEFI mode is enabled on an UEFI motherboard, Archiso will boot Arch Linux accordingly via systemd-boot. To verify this, list the efivars directory:  
+If UEFI mode is enabled on an UEFI motherboard, Archiso will boot Arch Linux accordingly via systemd-boot. To verify this, list the efivars directory:
 
 ```
 # ls /sys/firmware/efi/efivars
@@ -55,12 +55,12 @@ You should see something like this:
 		link/ether 00:00:00:00:00:00 brd ff:ff:ff:ff:ff:ff permaddr 00:00:00:00:00:00
 ```
 
-+ `enp0s0` is the wired interface  
-+ `wlan0` is the wireless interface  
++ `enp0s0` is the wired interface
++ `wlan0` is the wireless interface
 
 ### Wired Connection
 
-If you are on a wired connection, you can enable your wired interface by systemctl start `dhcpcd@<interface>`.  
+If you are on a wired connection, you can enable your wired interface by systemctl start `dhcpcd@<interface>`.
 
 ```
 # systemctl start dhcpcd@enp0s0
@@ -92,7 +92,7 @@ Ping archlinux website to make sure we are online:
 
 ```
 # ping archlinux.org
-``` 
+```
 
 If you receive Unknown host or Destination host unreachable response, means you are not online yet. Review your network configuration and redo the steps above.
 
@@ -114,7 +114,7 @@ When recognized by the live system, disks are assigned to a block device such as
 # lsblk
 ```
 
-## IMPORTANT: MAKE SURE TO CHOOSE THE CORRECT DRIVE TO FORMAT!!! 
+## IMPORTANT: MAKE SURE TO CHOOSE THE CORRECT DRIVE TO FORMAT!!!
 
 Results ending in `rom`, `loop` or `airoot` may be ignored.
 
@@ -226,10 +226,10 @@ You should see *something like this*:
 | sda2 | 8:2 | 0 | 1 | 0 | part |   |
 | sda3 | 8:3 | 0 | 175G | 0 | part |   |
 
-**`sda`** is the main disk  
-**`sda1`** is the boot partition  
-**`sda2`** is the swap partition  
-**`sda3`** is the home partition  
+**`sda`** is the main disk
+**`sda1`** is the boot partition
+**`sda2`** is the swap partition
+**`sda3`** is the home partition
 
 ### Encrypted filesystem
 
@@ -239,8 +239,8 @@ You should see *something like this*:
 | sda1 | 8:1 | 0 | 1 | 0 | part |   |
 | sda2 | 8:2 | 0 | 1 | 0 | part |   |
 
-**`sda`** is the main disk  
-**`sda1`** is the boot partition  
+**`sda`** is the main disk
+**`sda1`** is the boot partition
 **`sda2`** is the LVM partition
 
 **Surprise! Surprise!** We will **not** encrypt the `/boot` partition.
@@ -342,7 +342,7 @@ You should see *something like this*:
 + Create a `/boot` mountpoint:
 
 	```
-	# mkdir /mnt/boot  
+	# mkdir /mnt/boot
 	```
 
 + Mount `/dev/sda1` to `/mnt/boot` partition. This is will be our `/boot`:
@@ -354,7 +354,7 @@ You should see *something like this*:
 + Create a `/home` mountpoint:
 
 	```
-	# mkdir /mnt/home  
+	# mkdir /mnt/home
 	```
 
 + Mount `/dev/sda4` to `/mnt/home` partition. This is will be our `/home`:
@@ -374,7 +374,7 @@ You should see *something like this*:
 + Create a `/boot` mountpoint:
 
 	```
-	# mkdir /mnt/boot  
+	# mkdir /mnt/boot
 	```
 
 + Mount `/dev/sda1` to `/mnt/boot` partition. This is will be our `/boot`:
@@ -386,7 +386,7 @@ You should see *something like this*:
 + Create a `/home` mountpoint:
 
 	```
-	# mkdir /mnt/home  
+	# mkdir /mnt/home
 	```
 
 + Mount `/dev/mapper/volume-home` to `/mnt/home` partition. This is will be our `/home`:
@@ -395,19 +395,17 @@ You should see *something like this*:
 	# mount /dev/mapper/volume-home /mnt/home
 	```
 
-	 We don’t need to mount `swap` since it is already enabled.
-
 ## Installation
 
-Now let’s go ahead and install `base`, `linux`, `linux-firmware`, and `base-devel` packages into our system. 
+Now let’s go ahead and install `base`, `linux-zen`, `linux-lts`, `linux-firmware`, and `base-devel` packages into our system.
 
 ```
-# pacstrap /mnt base base-devel linux linux-zen linux-firmware
+# pacstrap /mnt base base-devel linux linux-firmware
 ```
 
-I will install `linux-zen` since it has necessary modules for gaming.
+I will install `linux` for this guide. I usually use `linux-zen` with `linux-lts` as backup.
 
-The `base` package does not include all tools from the live installation, so installing other packages may be necessary for a fully functional base system. In particular, consider installing: 
+The `base` package does not include all tools from the live installation, so installing other packages may be necessary for a fully functional base system. In particular, consider installing:
 
 + software necessary for networking,
 
@@ -437,7 +435,7 @@ The `base` package does not include all tools from the live installation, so ins
 
 + Microcode
 
-	- `intel-ucode`/`amd-ucode`
+	- `amd-ucode`
 
 + tools:
 
@@ -448,16 +446,14 @@ The `base` package does not include all tools from the live installation, so ins
 	- `bash-completion`: Programmable completion for the bash shell
 
 + userspace utilities for the management of file systems that will be used on the system,
-	
-	- `ntfs-3g`: NTFS filesystem driver and utilities
+
 	- `unrar`: The RAR uncompression program
 	- `unzip`: For extracting and viewing files in `.zip` archives
 	- `p7zip`: Command-line file archiver with high compression ratio
-	- `unarchiver`: `unar` and `lsar`: Objective-C tools for uncompressing archive files
 	- `gvfs-mtp`: Virtual filesystem implementation for `GIO` (`MTP` backend; Android, media player)
 	- `libmtp`: Library implementation of the Media Transfer Protocol
+	- `android-tols`: Android platform tools
 	- `android-udev`: Udev rules to connect Android devices to your linux box
-	- `mtpfs`: A FUSE filesystem that supports reading and writing from any MTP devic
 	- `xdg-user-dirs`: Manage user directories like `~/Desktop` and `~/Music`
 
 These tools will be useful later. So **future me**, install these.
@@ -468,11 +464,11 @@ These tools will be useful later. So **future me**, install these.
 # genfstab -U /mnt >> /mnt/etc/fstab
 ```
 
-Check the resulting `/mnt/etc/fstab` file, and edit it in case of errors. 
+Check the resulting `/mnt/etc/fstab` file, and edit it in case of errors.
 
 ## Chroot
 
-Now, change root into the newly installed system  
+Now, change root into the newly installed system
 
 ```
 # arch-chroot /mnt /bin/bash
@@ -486,7 +482,7 @@ A selection of timezones can be found under `/usr/share/zoneinfo/`. Since I am i
 # ln -sf /usr/share/zoneinfo/Asia/Manila /etc/localtime
 ```
 
-Run `hwclock` to generate `/etc/adjtime`: 
+Run `hwclock` to generate `/etc/adjtime`:
 
 ```
 # hwclock --systohc
@@ -496,15 +492,15 @@ This command assumes the hardware clock is set to UTC.
 
 ## Localization
 
-The `locale` defines which language the system uses, and other regional considerations such as currency denomination, numerology, and character sets. Possible values are listed in `/etc/locale.gen`. Uncomment `en_US.UTF-8`, as well as other needed localisations.
+The `locale` defines which language the system uses, and other regional considerations such as currency denomination, numerology, and character sets. Possible values are listed in `/etc/locale.gen`. Uncomment `en_US.UTF-8`, as well as other needed localization.
 
-**Uncomment** `en_US.UTF-8 UTF-8` and other needed locales in `/etc/locale.gen`, **save**, and generate them with:  
+**Uncomment** `en_US.UTF-8 UTF-8` and other needed locales in `/etc/locale.gen`, **save**, and generate them with:
 
 ```
 # locale-gen
 ```
 
-Create the `locale.conf` file, and set the LANG variable accordingly:  
+Create the `locale.conf` file, and set the LANG variable accordingly:
 
 ```
 # locale > /etc/locale.conf
@@ -529,14 +525,14 @@ Create the hostname file. In this guide I'll just use `MYHOSTNAME` as hostname. 
 Open `/etc/hosts` to add matching entries to `hosts`:
 
 ```
-127.0.0.1    localhost  
-::1          localhost  
+127.0.0.1    localhost
+::1          localhost
 127.0.1.1    MYHOSTNAME.localdomain	  MYHOSTNAME
 ```
 
 If the system has a permanent IP address, it should be used instead of `127.0.1.1`.
 
-## Initramfs  
+## Initramfs
 
 Creating a new initramfs is usually not required, because mkinitcpio was run on installation of the kernel package with pacstrap. **This is important** if you are setting up a system with encryption!
 
@@ -551,16 +547,6 @@ Creating a new initramfs is usually not required, because mkinitcpio was run on 
 ### Encrypted filesystem with LVM/LUKS
 
 + Open `/etc/mkinitcpio.conf` with an editor:
-
-+ In this guide, there are two ways to setting up initramfs, `udev` (default) and `systemd`. If you are planning to use `plymouth`(splashcreen), it is advisable to use a `systemd`-based initramfs.
-
-	- udev-based initramfs (default).
-
-		Find the `HOOKS` array, then change it to something like this:
-
-		```
-		HOOKS=(base udev autodetect keyboard modconf block encrypt lvm2 filesystems fsck)
-		```
 
 	- systemd-based initramfs.
 
@@ -578,33 +564,7 @@ Creating a new initramfs is usually not required, because mkinitcpio was run on 
 
 		DO NOT FORGET TO RUN THIS BEFORE REBOOTING YOUR SYSTEM!
 
-### Making Swap File and ZSwap
-
-#### Time to create a swap file! I'll make two gigabytes swap file.
-
-```
-# dd if=/dev/zero of=/swapfile bs=1M count=2048 status=progress
-```
-
-Set the right permissions
-```
-# chmod 0600 /swapfile
-```
-
-After creating the correctly sized file, format it to swap:
-```
-# mkswap -U clear /swapfile
-```
-
-Activate the swap file
-```
-# swapon /swapfile
-```
-
-Finally, edit the fstab configuration to add an entry for the swap file in `/etc/fstab`:
-```
-/swapfile none swap defaults,pri=10 0 0
-```
+### Making Swap through ZRAM
 
 #### Install zram-generator:
 
@@ -613,28 +573,13 @@ Finally, edit the fstab configuration to add an entry for the swap file in `/etc
 ```
 
 Let's make a config file at `/etc/systemd/zram-generator.conf
-!` I prefer having HALF of my TOTAL RAM as zswap size. My laptop have 4 cores, so I'll distribute it to FOUR zram devices. So I'll uthis config :
 
 ```
 [zram0]
-zram-size = ram/8
+zram-size = ram / 2
 compression-algorithm = zstd
 swap-priority = 100
-
-[zram1]
-zram-size = ram/8
-compression-algorithm = zstd
-swap-priority = 100
-
-[zram2]
-zram-size = ram/8
-compression-algorithm = zstd
-swap-priority = 100
-
-[zram3]
-zram-size = ram/8
-compression-algorithm = zstd
-swap-priority = 100
+fs-type = swap
 ```
 
 No need to enable/start anything, it will automatically initialize zram devices! Just reboot and run `swapon -s` to check the swap you have.
@@ -645,28 +590,18 @@ Enable multilib and AUR repositories in `/etc/pacman.conf`. Open it with your ed
 
 ### Adding multilib repository
 
-Uncomment `multilib` (remove # from the beginning of the lines). It should look like this:  
+Uncomment `multilib` (remove # from the beginning of the lines). It should look like this:
 
 ```
 [multilib]
 Include = /etc/pacman.d/mirrorlist
 ```
 
-### Adding the AUR repository
-
-Add the following lines at the end of your `/etc/pacman.conf` to enable the AUR repo:  
-
-```
-[archlinuxfr]
-SigLevel = Never
-Server = http://repo.archlinux.fr/$arch
-```
-
 ### `pacman` goodies
 
 You can enable the "easter-eggs" and goodies in `pacman`, the package manager of archlinux.
 
-Open `/etc/pacman.conf`, then find `# Misc options`. 
+Open `/etc/pacman.conf`, then find `# Misc options`.
 
 To add colors to `pacman`, uncomment `Color`. Then add `Pac-Man` to `pacman` by adding `ILoveCandy` under the `Color` string. To enable parallel downloads, uncomment it too:
 
@@ -688,7 +623,7 @@ If updating returns an error, open the `pacman.conf` again and check for human e
 
 ## Root password
 
-Set the `root` password:  
+Set the `root` password:
 
 ```
 # passwd
@@ -696,15 +631,15 @@ Set the `root` password:
 
 ## Add a user account
 
-Add a new user account. In this guide, I'll just use `MYUSERNAME` as the username of the new user aside from `root` account. (My phrasing seems redundant, eh?) Of course, change the example username with your own:  
+Add a new user account. In this guide, I'll just use `MYUSERNAME` as the username of the new user aside from `root` account. (My phrasing seems redundant, eh?) Of course, change the example username with your own:
 
 ```
-# useradd -m -g users -G wheel,storage,power,video,audio,rfkill,input -s /bin/bash MYUSERNAME
+# useradd -m -g users -G wheel -s /bin/bash MYUSERNAME
 ```
 
 This will create a new user and its `home` folder.
 
-Set the password of user `MYUSERNAME`:  
+Set the password of user `MYUSERNAME`:
 
 ```
 # passwd MYUSERNAME
@@ -726,10 +661,10 @@ Uncomment the line (Remove #):
 
 ## Install the boot loader
 
-Yeah, this is where we install the bootloader. We will be using `systemd-boot`, so no need for `grub2`. 
+Yeah, this is where we install the bootloader. We will be using `systemd-boot`, so no need for `grub2`.
 
 + Install bootloader:
-	
+
 	We will install it in `/boot` mountpoint (`/dev/sda1` partition).
 
 	```
@@ -741,13 +676,13 @@ Yeah, this is where we install the bootloader. We will be using `systemd-boot`, 
 ### Unencrypted filesystem
 
 	```
-	title Arch Linux  
-	linux /vmlinuz-linux  
-	initrd  /initramfs-linux.img  
+	title Arch Linux
+	linux /vmlinuz-linux
+	initrd  /initramfs-linux.img
 	options root=/dev/sda3 rw
 	```
 
-	If your `/` is not in `/dev/sda3`, make sure to change it. 
+	If your `/` is not in `/dev/sda3`, make sure to change it.
 
 	Save and exit.
 
@@ -758,9 +693,9 @@ Remember the two-types of initramfs earlier? Each type needs a specific kernel p
 + udev-based initramfs
 
 	```
-	title Arch Linux  
-	linux /vmlinuz-linux  
-	initrd  /initramfs-linux.img  
+	title Arch Linux
+	linux /vmlinuz-linux
+	initrd  /initramfs-linux.img
 	options cryptdevice=UUID=/DEV/SDA2/UUID/HERE:volume root=/dev/mapper/volume-root rw
 	```
 
@@ -801,7 +736,7 @@ editor no
 
 #### Microcode
 
-Processor manufacturers release stability and security updates to the processor microcode. These updates provide bug fixes that can be critical to the stability of your system. Without them, you may experience spurious crashes or unexpected system halts that can be difficult to track down. 
+Processor manufacturers release stability and security updates to the processor microcode. These updates provide bug fixes that can be critical to the stability of your system. Without them, you may experience spurious crashes or unexpected system halts that can be difficult to track down.
 
 If you didn't install it using pacstrap, install microcode by:
 
@@ -811,13 +746,7 @@ For AMD processors:
 # pacman -S amd-ucode
 ```
 
-For Intel processors:
-
-```
-# pacman -S intel-ucode
-```
-
-If your Arch installation is on a removable drive that needs to have microcode for both manufacturer processors, install both packages. 
+If your Arch installation is on a removable drive that needs to have microcode for both manufacturer processors, install both packages.
 
 Load  microcode. For `systemd-boot`, use the `initrd` option to load the microcode, **before** the initial ramdisk, as follows:
 
@@ -843,14 +772,14 @@ To enable the network daemons on your next reboot, you need to enable `dhcpcd.se
 # systemctl enable dhcpcd iwd
 ```
 
-## Exit chroot and reboot:  
+## Exit chroot and reboot:
 
-Exit the chroot environment by typing `exit` or pressing <kbd>Ctrl + d</kbd>. You can also unmount all mounted partition after this. 
+Exit the chroot environment by typing `exit` or pressing <kbd>Ctrl + d</kbd>. You can also unmount all mounted partition after this.
 
 Finally, `reboot`.
 
 ##  Finale
 
-If your installation is a success, then ***yay!!!*** If not, you should start questioning your own existence. Are your parents proud of you? 
+If your installation is a success, then ***yay!!!*** If not, you should start questioning your own existence. Are your parents proud of you?
 
 ## [[POST INSTALLATION]](./POST.md)		[[EXTRAS]](./EXTRAS.md)
