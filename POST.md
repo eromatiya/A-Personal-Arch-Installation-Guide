@@ -20,7 +20,7 @@ It's recommended to check for updates first before installing anything so:
 
 For AMD:
 ```
-# pacman -S mesa lib32-mesa vulkan-radeon lib32-vulkan-radeon libva-mesa-driver libva-utils
+# pacman -S mesa lib32-mesa vulkan-radeon lib32-vulkan-radeon libva-utils
 ```
 
 Add your (kernel) graphics driver to your initramfs. For example, if using `intel` add `i915` or if using `amd` add `amdgpu`:
@@ -291,7 +291,7 @@ Edit boot loader kernel parameters:
 On a new line add these parameters:
 
 ```
-options quiet splash loglevel=3 rd.udev.log_priority=3 rd.systemd.show_status=auto rd.systemd.show_status=auto consoleblank=0
+options quiet splash loglevel=3 rd.udev.log_priority=3 rd.systemd.show_status=auto consoleblank=0
 ```
 
 If you're using `plymouth` and its `splash` kernel parameter, put `splash` after the `quiet` parameter.
